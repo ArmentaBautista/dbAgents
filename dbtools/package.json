@@ -1,0 +1,37 @@
+{
+  "name": "dbtools",
+  "version": "1.0.0",
+  "description": "SQL Server orchestrator agent and specialized skills for AI coding tools (OpenCode, Kilo Code, Claude Code, Gemini CLI, Codex CLI, Antigravity)",
+  "main": "install.js",
+  "bin": {
+    "dbtools": "./install.js"
+  },
+  "files": [
+    "install.js",
+    "orchestrator-prompt.md",
+    "README.md",
+    "skills",
+    "agents"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [
+    "sql-server",
+    "dba",
+    "orchestrator",
+    "ai-agents",
+    "agent-skills",
+    "claude-code",
+    "opencode",
+    "kilo-code",
+    "codex-cli",
+    "antigravity"
+  ],
+  "scripts": {
+    "install": "node install.js",
+    "uninstall": "node install.js --uninstall"
+  },
+  "author": "",
+  "license": "MIT"
+}

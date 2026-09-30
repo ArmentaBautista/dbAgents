@@ -17,8 +17,11 @@ if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
-# 2. Si se ejecuta localmente (en la misma carpeta del instalador)
-$LocalScript = Join-Path $PSScriptRoot "install.js"
+# 2. Si se ejecuta localmente (en la misma carpeta del instalador o repo)
+$LocalScript = Join-Path $PSScriptRoot "dbtools\install.js"
+if (-not (Test-Path $LocalScript)) {
+    $LocalScript = Join-Path $PSScriptRoot "install.js"
+}
 if ($PSScriptRoot -and (Test-Path $LocalScript)) {
     & node $LocalScript @InstallArgs
     exit $LASTEXITCODE
@@ -29,12 +32,11 @@ $TempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("dbtools-install-" + [Sy
 New-Item -ItemType Directory -Path $TempDir -Force | Out-Null
 
 try {
-    # Repositorio por defecto (se puede sobreescribir con variable de entorno DBTOOLS_REPO)
     $Repo = if ($env:DBTOOLS_REPO) { $env:DBTOOLS_REPO } else { "https://github.com/ArmentaBautista/dbAgents/archive/refs/heads/main.zip" }
-    $ZipPath = Join-Path $TempDir "dbtools.zip"
+    $ZipPath = Join-Path $TempDir "dbagents.zip"
     $ExtractPath = Join-Path $TempDir "extracted"
 
-    Write-Host "Descargando dbtools..." -ForegroundColor Cyan
+    Write-Host "Descargando dbAgents..." -ForegroundColor Cyan
     Invoke-WebRequest -Uri $Repo -OutFile $ZipPath -UseBasicParsing
 
     Write-Host "Extrayendo archivos..." -ForegroundColor Cyan

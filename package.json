@@ -1,0 +1,37 @@
+{
+  "name": "dbagents",
+  "version": "1.0.0",
+  "description": "SQL Server orchestrator agent and specialized skills for AI coding tools (OpenCode, Kilo Code, Claude Code, Gemini CLI, Codex CLI, Antigravity)",
+  "main": "dbtools/install.js",
+  "bin": {
+    "dbtools": "./dbtools/install.js"
+  },
+  "files": [
+    "dbtools"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [
+    "sql-server",
+    "dba",
+    "orchestrator",
+    "ai-agents",
+    "agent-skills",
+    "claude-code",
+    "opencode",
+    "kilo-code",
+    "codex-cli",
+    "antigravity"
+  ],
+  "scripts": {
+    "install": "node dbtools/install.js",
+    "uninstall": "node dbtools/install.js --uninstall"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ArmentaBautista/dbAgents.git"
+  },
+  "author": "ArmentaBautista",
+  "license": "MIT"
+}

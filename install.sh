@@ -14,12 +14,15 @@ if ! command -v node >/dev/null 2>&1; then
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" >/dev/null 2>&1 && pwd)"
-if [ -f "$SCRIPT_DIR/install.js" ]; then
+if [ -f "$SCRIPT_DIR/dbtools/install.js" ]; then
+    node "$SCRIPT_DIR/dbtools/install.js" "$@"
+    exit $?
+elif [ -f "$SCRIPT_DIR/install.js" ]; then
     node "$SCRIPT_DIR/install.js" "$@"
     exit $?
 fi
 
-TMP_DIR=$(mktemp -d -t dbtools-XXXXXX)
+TMP_DIR=$(mktemp -d -t dbagents-XXXXXX)
 cleanup() {
     rm -rf "$TMP_DIR"
 }
@@ -27,7 +30,7 @@ trap cleanup EXIT
 
 REPO_URL="${DBTOOLS_REPO:-https://github.com/ArmentaBautista/dbAgents/archive/refs/heads/main.tar.gz}"
 
-echo -e "\033[0;36mDescargando dbtools...\033[0m"
+echo -e "\033[0;36mDescargando dbAgents...\033[0m"
 curl -fsSL "$REPO_URL" | tar -xz -C "$TMP_DIR"
 
 INSTALL_JS=$(find "$TMP_DIR" -name "install.js" | head -n 1)

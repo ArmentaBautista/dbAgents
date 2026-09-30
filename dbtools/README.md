@@ -17,38 +17,38 @@ Requiere Node.js 16+:
 
 ```bash
 # Instalación global en todas las tools
-npx github:USUARIO/REPO
+npx github:ArmentaBautista/dbAgents
 
 # Solo para herramientas específicas
-npx github:USUARIO/REPO opencode kilocode
-npx github:USUARIO/REPO codex antigravity
+npx github:ArmentaBautista/dbAgents opencode kilocode
+npx github:ArmentaBautista/dbAgents codex antigravity
 
 # En el directorio del proyecto actual
-npx github:USUARIO/REPO --project .
+npx github:ArmentaBautista/dbAgents --project .
 
 # Simulación previa (dry-run)
-npx github:USUARIO/REPO --dry-run
+npx github:ArmentaBautista/dbAgents --dry-run
 
 # Desinstalación limpia
-npx github:USUARIO/REPO --uninstall
+npx github:ArmentaBautista/dbAgents --uninstall
 ```
 
 ### 2. Con PowerShell (Windows)
 ```powershell
 # Instalación global
-irm https://raw.githubusercontent.com/USUARIO/REPO/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/install.ps1 | iex
 
 # O pasando opciones específicas
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/USUARIO/REPO/main/install.ps1))) opencode kilocode
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/install.ps1))) opencode kilocode
 ```
 
 ### 3. Con Bash (Linux / macOS)
 ```bash
 # Instalación global
-curl -fsSL https://raw.githubusercontent.com/USUARIO/REPO/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/install.sh | bash
 
 # O pasando opciones específicas
-curl -fsSL https://raw.githubusercontent.com/USUARIO/REPO/main/install.sh | bash -s -- opencode kilocode
+curl -fsSL https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/install.sh | bash -s -- opencode kilocode
 ```
 
 ---
@@ -58,8 +58,8 @@ curl -fsSL https://raw.githubusercontent.com/USUARIO/REPO/main/install.sh | bash
 Si prefieres clonar el código en tu máquina:
 
 ```bash
-git clone https://github.com/USUARIO/REPO.git
-cd REPO
+git clone https://github.com/ArmentaBautista/dbAgents.git
+cd dbAgents/dbtools
 
 # Instalación
 node install.js                        # todo, global (usuario)

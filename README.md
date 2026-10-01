@@ -6,11 +6,44 @@ Opera bajo una **política estricta de solo lectura** (diagnóstico, catálogo, 
 
 | Pieza | Formato | Portable |
 |---|---|---|
-| `skills/` (5 skills) | **Agent Skills** (`SKILL.md` con frontmatter `name`/`description`) | ✅ copiar y pegar |
+| `skills/` (6 skills: 1 orquestador + 5 subagentes) | **Agent Skills** (`SKILL.md` con frontmatter `name`/`description`) | ✅ copiar y pegar |
 | `agents/` (1 orquestador + 5 subagentes) | Markdown con frontmatter (`mode`, `description`, `permission`) | ✅ copiar según la tool |
 | `orchestrator-prompt.md` | Prompt reutilizable (para `AGENTS.md`/rules) | ✅ copiar y pegar |
 
 ---
+
+## Requisitos antes de instalar
+
+Asegurese de contar con Node, Npm y Git instalados antes de intentar instalar el Agente/Skills
+En caso de que no cuenta con ellos, siga los pasos a continuación, en caso contrario, dirijase al apartado de Instalación.
+
+1. NodeJS. Abra una terminal: 
+``` ps1 
+# Ejecute el siguiente comando que descargará el instalador gráfico, siga las indicaciones del mismo.
+winget install OpenJS.NodeJS.LTS --source winget
+
+
+# Valide que la instalación fue correcta
+node -v
+npm -v
+
+# Si puede ver el número de versión de ambos, continue con el paso 2
+```
+2. GIT. En una terminal:
+``` ps1 
+# Ejecute el siguiente comando que descargará el instalador gráfico, siga las indicaciones del mismo.
+winget install Git.Git --source winget
+
+# Valide que la instalación fue correcta
+git --version
+
+# Si puede ver el número de versión continue con las instalación del Agente/Skills
+
+# Es posible que al ejecutar npx en powershell tenga un error debido a la política de bloqueo de scripts
+# en ese caso puede abrir una terminal como administrador y ejecutar:
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+```
 
 ## Instalación One-Liner desde GitHub (sin clonar)
 
@@ -99,7 +132,8 @@ dbAgents/
 └── dbtools/
     ├── install.js                # motor instalador (Node.js, sin dependencias)
     ├── orchestrator-prompt.md    # persona orquestadora
-    ├── skills/                   # 5 skills en formato Agent Skills
+    ├── skills/                   # 6 skills en formato Agent Skills
+    │   ├── dbtools/SKILL.md      # orquestador ejecutable como skill
     │   ├── sql-server-developer/SKILL.md
     │   ├── sql-server-administrator/SKILL.md
     │   ├── sql-server-tuning/SKILL.md
@@ -127,3 +161,5 @@ Estas tools conectan a la BD de dos formas:
 2. **MCP de SQL Server** — configura un servidor MCP apuntando a una conexión de solo lectura.
 
 **Regla inquebrantable:** ningún agente crea/modifica/elimina objetos, elementos o datos. Solo `SELECT`, catálogo (`sys.*`) y DMVs (`sys.dm_*`). Los cambios se entregan como script para que el usuario los ejecute.
+
+

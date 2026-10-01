@@ -4,7 +4,7 @@ Este paquete contiene el agente **dbtools** (SQL Server Standard/Enterprise) en 
 
 | Pieza | Formato | Portable |
 |---|---|---|
-| `skills/` (5 skills) | **Agent Skills** (`SKILL.md` con frontmatter `name`/`description`) | ✅ copiar y pegar |
+| `skills/` (6 skills: 1 orquestador + 5 subagentes) | **Agent Skills** (`SKILL.md` con frontmatter `name`/`description`) | ✅ copiar y pegar |
 | `agents/` (1 orquestador + 5 subagentes) | Markdown con frontmatter (`mode`, `description`, `permission`) | ✅ copiar según la tool |
 | `orchestrator-prompt.md` | Prompt reutilizable (para `AGENTS.md`/rules) | ✅ copiar y pegar |
 
@@ -95,7 +95,8 @@ dbtools/
 ├── README.md                     # instrucciones de instalación
 ├── install.js                    # instalador automático (Node.js, sin dependencias)
 ├── orchestrator-prompt.md        # persona orquestadora (reutilizable como regla/instrucción)
-├── skills/                       # 5 skills en formato Agent Skills
+├── skills/                       # 6 skills en formato Agent Skills
+│   ├── dbtools/SKILL.md          # orquestador ejecutable como skill
 │   ├── sql-server-developer/SKILL.md
 │   ├── sql-server-administrator/SKILL.md
 │   ├── sql-server-tuning/SKILL.md

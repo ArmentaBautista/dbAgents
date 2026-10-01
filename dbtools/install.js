@@ -40,6 +40,7 @@ const HOME = os.homedir();
 const KNOWN_TARGETS = ['opencode', 'kilocode', 'claude', 'gemini', 'codex', 'antigravity'];
 
 const KNOWN_DBTOOLS_SKILLS = [
+  'dbtools',
   'sql-server-developer',
   'sql-server-administrator',
   'sql-server-tuning',

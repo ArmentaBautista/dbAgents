@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 /*
- * dbtools — instalador y desinstalador portable
+ * dbtools — instalador y desinstalador
  * Copia o elimina las skills y los agentes del paquete dbtools de las tools de IA:
  *   OpenCode, Kilo Code, Claude Code, Gemini CLI, Codex CLI y Antigravity.
  *
@@ -75,7 +75,7 @@ const SUITES = {
     ruleFileName: 'software-archeologist.md',
     pluginName: 'softarch',
     pluginDesc: 'Software Archaeologist for legacy code investigation, intent recovery and risk analysis',
-    knownSkills: [],
+    knownSkills: ['softarch'],
     knownAgents: ['softarch'],
   },
 };
@@ -112,7 +112,7 @@ function getSuiteAgentNames(suiteKey) {
 // CLI
 // ---------------------------------------------------------------------------
 function usage() {
-  console.log(`dbAgents — instalador y desinstalador portable de agentes y skills
+  console.log(`dbAgents — instalador y desinstalador de agentes y skills
 
 Uso:
   node install.js [target...] [opciones]
@@ -516,7 +516,7 @@ function installAntigravityPlugin(suite) {
 }
 
 function installSkills(tool, toolId, suite) {
-  const dst = tool.skillsDir();
+  const dst = tool.skillsDir(suite);
   if (!fs.existsSync(suite.skillsDir)) {
     return 0;
   }
@@ -525,8 +525,10 @@ function installSkills(tool, toolId, suite) {
     console.log(`  skills (${suite.name}) -> ${dst}  (${results.length} archivos)`);
   }
 
-  // Para Antigravity en modo global: copiar también a ~/.gemini/skills y ~/.gemini/antigravity-cli/skills
+  // Para Antigravity en modo global: copiar también a ~/.gemini/skills, ~/.gemini/antigravity/skills y cli
   if (toolId === 'antigravity' && opts.scope === 'global' && results.length > 0) {
+    const agySkills = path.join(HOME, '.gemini', 'antigravity', 'skills');
+    copyDirRecursive(suite.skillsDir, agySkills, opts.overwrite);
     const sharedSkills = path.join(HOME, '.gemini', 'skills');
     copyDirRecursive(suite.skillsDir, sharedSkills, opts.overwrite);
     const cliSkills = path.join(HOME, '.gemini', 'antigravity-cli', 'skills');
@@ -724,9 +726,10 @@ function uninstallAntigravityPlugin(suite) {
 function uninstallSkills(tool, toolId, suite) {
   const skillNames = getSuiteSkillNames(suite.name);
   if (skillNames.length === 0) return 0;
-  const dirs = [tool.skillsDir()];
+  const dirs = [tool.skillsDir(suite)];
 
   if (toolId === 'antigravity' && opts.scope === 'global') {
+    dirs.push(path.join(HOME, '.gemini', 'antigravity', 'skills'));
     dirs.push(path.join(HOME, '.gemini', 'skills'));
     const cliSkills = path.join(HOME, '.gemini', 'antigravity-cli', 'skills');
     if (fs.existsSync(cliSkills)) dirs.push(cliSkills);

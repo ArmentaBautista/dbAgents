@@ -1,14 +1,15 @@
-# dbAgents — Orquestador de Agentes y Skills SQL Server
+# dbAgents — Orquestador de Agentes y Skills Multi-Suite
 
-Suite portable de agentes y skills especializadas en Microsoft SQL Server (Standard/Enterprise) para herramientas de IA como **OpenCode, Kilo Code, Claude Code, Gemini CLI, Codex CLI y Google Antigravity**.
+Suite portable de agentes y skills para herramientas de IA como **OpenCode, Kilo Code, Claude Code, Gemini CLI, Codex CLI, Google Antigravity y GitHub Copilot**.
 
-Opera bajo una **política estricta de solo lectura** (diagnóstico, catálogo, DMVs y consultas SELECT).
+Actualmente incluye dos suites independientes:
+1. **dbtools (SQL Server)**: 1 agente orquestador + 5 subagentes especialistas (developer, administrator, tuning, audit/security, data-analyst) bajo estricta política de **solo lectura**.
+2. **softarch (Software Archaeologist)**: Agente arqueólogo de software para inspección de código legado, minería de intenciones y análisis de riesgos bajo operación estrictamente **no destructiva**.
 
-| Pieza | Formato | Portable |
-|---|---|---|
-| `skills/` (6 skills: 1 orquestador + 5 subagentes) | **Agent Skills** (`SKILL.md` con frontmatter `name`/`description`) | ✅ copiar y pegar |
-| `agents/` (1 orquestador + 5 subagentes) | Markdown con frontmatter (`mode`, `description`, `permission`) | ✅ copiar según la tool |
-| `orchestrator-prompt.md` | Prompt reutilizable (para `AGENTS.md`/rules) | ✅ copiar y pegar |
+| Suite | Componentes | Rol | Enfoque |
+|---|---|---|---|
+| `dbtools` | 1 orquestador + 5 subagentes + 6 skills | Administración, tuning, auditoría y desarrollo SQL Server | Solo lectura (`SELECT`, `sys.*`, `sys.dm_*`) |
+| `softarch` | 1 agente principal | Arqueología de software, código legado e intención | Análisis no destructivo y basado en evidencia |
 
 ---
 
@@ -53,8 +54,14 @@ La forma más rápida de instalarlo sin descargar ni clonar el repositorio manua
 Requiere Node.js 16+:
 
 ```bash
-# Instalación global en todas las tools soportadas
+# Instalación global de todas las suites en todas las tools soportadas
 npx github:ArmentaBautista/dbAgents
+
+# Instalar únicamente la suite softarch (Arqueólogo de Software)
+npx github:ArmentaBautista/dbAgents --suite softarch
+
+# Instalar únicamente dbtools (SQL Server)
+npx github:ArmentaBautista/dbAgents --suite dbtools
 
 # Solo para herramientas específicas
 npx github:ArmentaBautista/dbAgents opencode kilocode
@@ -72,19 +79,21 @@ npx github:ArmentaBautista/dbAgents --uninstall
 
 ### 2. Con PowerShell (Windows)
 ```powershell
-# Instalación global
+# Instalación global (todas las suites)
 irm https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/install.ps1 | iex
 
 # O pasando opciones específicas
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/install.ps1))) --suite softarch
 & ([scriptblock]::Create((irm https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/install.ps1))) opencode kilocode
 ```
 
 ### 3. Con Bash (Linux / macOS)
 ```bash
-# Instalación global
+# Instalación global (todas las suites)
 curl -fsSL https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/install.sh | bash
 
 # O pasando opciones específicas
+curl -fsSL https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/install.sh | bash -s -- --suite softarch
 curl -fsSL https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/install.sh | bash -s -- opencode kilocode
 ```
 
@@ -97,8 +106,10 @@ git clone https://github.com/ArmentaBautista/dbAgents.git
 cd dbAgents/dbtools
 
 # Instalación
-node install.js                        # todo, global (usuario)
-node install.js opencode kilocode      # solo esas dos
+node install.js                        # todas las suites, global (usuario)
+node install.js --suite softarch       # solo suite softarch
+node install.js --suite dbtools        # solo suite dbtools SQL Server
+node install.js opencode kilocode      # solo esas dos herramientas
 node install.js codex antigravity      # Codex CLI y Antigravity
 node install.js --project .            # todo, dentro del proyecto actual
 node install.js --dry-run              # previsualizar sin escribir
@@ -106,6 +117,7 @@ node install.js --no-overwrite         # no sobrescribir archivos existentes
 
 # Desinstalación
 node install.js --uninstall            # desinstalar todo a nivel global
+node install.js --suite softarch -u    # desinstalar solo softarch
 node install.js -u --dry-run           # previsualizar qué se desinstalaría
 node install.js codex --uninstall      # desinstalar solo de Codex
 node install.js --project . -u         # desinstalar del proyecto actual
@@ -113,9 +125,10 @@ node install.js --project . -u         # desinstalar del proyecto actual
 
 | Flag | Efecto |
 |---|---|
-| `--global` (por defecto) | instala/desinstala en la carpeta de usuario de cada tool (OpenCode `~/.config/opencode`, Kilo `~/.kilo`, Claude `~/.claude` + Desktop, Gemini `~/.gemini`, Codex `~/.codex` + `~/.agents`, Antigravity Plugin `~/.gemini/config/plugins/dbtools` + `~/.gemini/config/agents`) |
-| `--project <dir>` | instala/desinstala dentro de un proyecto (`.opencode/`, `.kilo/`, `.claude/`, `.gemini/`, `.agents/` + `.codex/`, y `AGENTS.md`/`CLAUDE.md` según la tool) |
-| `--uninstall`, `-u` | desinstala las skills, agentes, plugins y contextos creados por dbtools sin tocar otros agentes del usuario |
+| `--suite <name>` | suite a instalar/desinstalar: `dbtools`, `softarch` o `all` (por defecto: `all`) |
+| `--global` (por defecto) | instala/desinstala en la carpeta de usuario de cada tool |
+| `--project <dir>` | instala/desinstala dentro de un proyecto |
+| `--uninstall`, `-u` | desinstala las skills, agentes y plugins correspondientes sin tocar configuraciones ajenas |
 | `--dry-run` | muestra qué haría sin escribir ni borrar nada |
 | `--no-overwrite` | no pisa archivos existentes (solo aplica a instalación) |
 
@@ -129,11 +142,14 @@ dbAgents/
 ├── install.ps1                   # instalador one-liner PowerShell
 ├── install.sh                    # instalador one-liner Bash
 ├── README.md                     # documentación general
-└── dbtools/
+├── softarch/                     # Suite de Arqueología de Software
+│   └── agents/
+│       └── softarch.md           # Agente arqueólogo de software
+└── dbtools/                      # Suite de SQL Server
     ├── install.js                # motor instalador (Node.js, sin dependencias)
     ├── orchestrator-prompt.md    # persona orquestadora
     ├── skills/                   # 6 skills en formato Agent Skills
-    │   ├── dbtools/SKILL.md      # orquestador ejecutable como skill
+    │   ├── dbtools/SKILL.md
     │   ├── sql-server-developer/SKILL.md
     │   ├── sql-server-administrator/SKILL.md
     │   ├── sql-server-tuning/SKILL.md

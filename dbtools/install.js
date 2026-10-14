@@ -32,36 +32,58 @@ const path = require('path');
 const os = require('os');
 
 const BUNDLE_DIR = __dirname;
-const SKILLS_SRC = path.join(BUNDLE_DIR, 'skills');
-const AGENTS_SRC = path.join(BUNDLE_DIR, 'agents');
-const PERSONA_SRC = path.join(BUNDLE_DIR, 'orchestrator-prompt.md');
+const ROOT_DIR = path.resolve(BUNDLE_DIR, '..');
 const HOME = os.homedir();
 
-const KNOWN_TARGETS = ['opencode', 'kilocode', 'claude', 'gemini', 'codex', 'antigravity'];
+const KNOWN_TARGETS = ['opencode', 'kilocode', 'claude', 'gemini', 'codex', 'antigravity', 'copilot'];
+const KNOWN_SUITES = ['dbtools', 'softarch', 'all'];
 
-const KNOWN_DBTOOLS_SKILLS = [
-  'dbtools',
-  'sql-server-developer',
-  'sql-server-administrator',
-  'sql-server-tuning',
-  'sql-server-audit-security',
-  'sql-server-data-analyst',
-];
+const SUITES = {
+  dbtools: {
+    name: 'dbtools',
+    label: 'dbtools (SQL Server Suite)',
+    skillsDir: path.join(BUNDLE_DIR, 'skills'),
+    agentsDir: path.join(BUNDLE_DIR, 'agents'),
+    personaFile: path.join(BUNDLE_DIR, 'orchestrator-prompt.md'),
+    pluginName: 'dbtools',
+    pluginDesc: 'SQL Server Standard/Enterprise suite with 5 specialized skills and orchestrator persona',
+    knownSkills: [
+      'dbtools',
+      'sql-server-developer',
+      'sql-server-administrator',
+      'sql-server-tuning',
+      'sql-server-audit-security',
+      'sql-server-data-analyst',
+    ],
+    knownAgents: [
+      'dbtools',
+      'sql-server-developer',
+      'sql-server-administrator',
+      'sql-server-tuning',
+      'sql-server-audit-security',
+      'sql-server-data-analyst',
+    ],
+  },
+  softarch: {
+    name: 'softarch',
+    label: 'softarch (Software Archaeologist)',
+    skillsDir: path.join(ROOT_DIR, 'softarch', 'skills'),
+    agentsDir: path.join(ROOT_DIR, 'softarch', 'agents'),
+    personaFile: null,
+    pluginName: 'softarch',
+    pluginDesc: 'Software Archaeologist for legacy code investigation, intent recovery and risk analysis',
+    knownSkills: [],
+    knownAgents: ['softarch'],
+  },
+};
 
-const KNOWN_DBTOOLS_AGENTS = [
-  'dbtools',
-  'sql-server-developer',
-  'sql-server-administrator',
-  'sql-server-tuning',
-  'sql-server-audit-security',
-  'sql-server-data-analyst',
-];
-
-function getDbtoolsSkillNames() {
-  const list = new Set(KNOWN_DBTOOLS_SKILLS);
-  if (fs.existsSync(SKILLS_SRC)) {
+function getSuiteSkillNames(suiteKey) {
+  const s = SUITES[suiteKey];
+  if (!s) return [];
+  const list = new Set(s.knownSkills);
+  if (fs.existsSync(s.skillsDir)) {
     try {
-      for (const entry of fs.readdirSync(SKILLS_SRC, { withFileTypes: true })) {
+      for (const entry of fs.readdirSync(s.skillsDir, { withFileTypes: true })) {
         if (entry.isDirectory()) list.add(entry.name);
       }
     } catch (_) {}
@@ -69,11 +91,13 @@ function getDbtoolsSkillNames() {
   return Array.from(list);
 }
 
-function getDbtoolsAgentNames() {
-  const list = new Set(KNOWN_DBTOOLS_AGENTS);
-  if (fs.existsSync(AGENTS_SRC)) {
+function getSuiteAgentNames(suiteKey) {
+  const s = SUITES[suiteKey];
+  if (!s) return [];
+  const list = new Set(s.knownAgents);
+  if (fs.existsSync(s.agentsDir)) {
     try {
-      for (const f of fs.readdirSync(AGENTS_SRC)) {
+      for (const f of fs.readdirSync(s.agentsDir)) {
         if (f.endsWith('.md')) list.add(f.replace(/\.md$/, ''));
       }
     } catch (_) {}
@@ -85,38 +109,52 @@ function getDbtoolsAgentNames() {
 // CLI
 // ---------------------------------------------------------------------------
 function usage() {
-  console.log(`dbtools — instalador y desinstalador portable de skills y agentes SQL Server
+  console.log(`dbAgents — instalador y desinstalador portable de agentes y skills
 
 Uso:
   node install.js [target...] [opciones]
 
-targets:  opencode | kilocode | claude | gemini | codex | antigravity | all   (por defecto: all)
+targets:  opencode | kilocode | claude | gemini | codex | antigravity | copilot | all   (por defecto: all)
 
 opciones:
+  --suite <name>      suite a instalar: dbtools | softarch | all (por defecto: all)
   --global            instalar/desinstalar a nivel de usuario (por defecto)
   --project <dir>     instalar/desinstalar dentro de un proyecto
-  --uninstall, -u     desinstalar skills, agentes y configuración de dbtools
+  --uninstall, -u     desinstalar skills, agentes y configuración
   --dry-run           solo previsualizar, sin modificar ni borrar
   --no-overwrite      no sobrescribir archivos existentes (solo instalación)
   --help, -h          esta ayuda
 
 Ejemplos:
-  node install.js                       # instalar todo, global
-  node install.js --uninstall           # desinstalar todo, global
-  node install.js codex --uninstall     # desinstalar solo de Codex
-  node install.js -u --dry-run          # previsualizar desinstalación
+  node install.js                       # instalar todas las suites, global
+  node install.js copilot               # instalar en GitHub Copilot
+  node install.js --suite softarch      # instalar solo el agente softarch
+  node install.js --suite dbtools       # instalar solo el equipo dbtools SQL Server
+  node install.js claude -u             # desinstalar todo de Claude
+  node install.js --suite softarch -u   # desinstalar solo softarch
   node install.js --project .           # instalar en proyecto actual
-  node install.js --project . -u        # desinstalar del proyecto actual
 `);
 }
 
 function parseArgs(argv) {
-  const opts = { targets: [], scope: 'global', projectDir: null, dryRun: false, overwrite: true, uninstall: false };
+  const opts = { targets: [], suites: [], scope: 'global', projectDir: null, dryRun: false, overwrite: true, uninstall: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === 'all') opts.targets = KNOWN_TARGETS.slice();
     else if (a === 'uninstall' || a === '--uninstall' || a === '-u') opts.uninstall = true;
+    else if (a === 'copilot' || a === 'github-copilot') {
+      if (!opts.targets.includes('copilot')) opts.targets.push('copilot');
+    }
     else if (KNOWN_TARGETS.includes(a)) { if (!opts.targets.includes(a)) opts.targets.push(a); }
+    else if (a === '--suite') {
+      const suiteVal = argv[++i];
+      if (suiteVal === 'all') opts.suites = ['dbtools', 'softarch'];
+      else if (KNOWN_SUITES.includes(suiteVal)) opts.suites.push(suiteVal);
+      else { console.error('Suite desconocida: ' + suiteVal); usage(); process.exit(2); }
+    }
+    else if (a === 'dbtools' || a === 'softarch') {
+      if (!opts.suites.includes(a)) opts.suites.push(a);
+    }
     else if (a === '--global') opts.scope = 'global';
     else if (a === '--project') { opts.scope = 'project'; opts.projectDir = path.resolve(argv[++i] || '.'); }
     else if (a === '--dry-run') opts.dryRun = true;
@@ -125,6 +163,7 @@ function parseArgs(argv) {
     else { console.error('Argumento desconocido: ' + a); usage(); process.exit(2); }
   }
   if (opts.targets.length === 0) opts.targets = KNOWN_TARGETS.slice();
+  if (opts.suites.length === 0) opts.suites = ['dbtools', 'softarch'];
   return opts;
 }
 
@@ -323,6 +362,31 @@ const TOOLS = {
     },
     reloadNote: 'Usa /agents o inicia una conversación para ver los agentes y skills.',
   },
+  copilot: {
+    label: 'GitHub Copilot',
+    // GitHub Copilot en VS Code y CLI soporta instrucciones personalizadas en .github/copilot-instructions.md
+    // y agentes personalizados / promts en .github/prompts/ o .github/agents/
+    skillsDir() {
+      return opts.scope === 'project'
+        ? path.join(opts.projectDir, '.github', 'skills')
+        : path.join(HOME, '.github', 'skills');
+    },
+    agentsDir() {
+      return opts.scope === 'project'
+        ? path.join(opts.projectDir, '.github', 'agents')
+        : path.join(HOME, '.github', 'agents');
+    },
+    hasAgents: true,
+    antigravityFormat: false,
+    codexFormat: false,
+    claudeFormat: false,
+    contextFile() {
+      return opts.scope === 'project'
+        ? path.join(opts.projectDir, '.github', 'copilot-instructions.md')
+        : path.join(HOME, '.github', 'copilot-instructions.md');
+    },
+    reloadNote: 'Recarga la ventana de VS Code o reinicia la sesión de GitHub Copilot.',
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -398,14 +462,14 @@ function codexAgentContent(name, content) {
   ].join('\n');
 }
 
-function installAntigravityPlugin() {
-  if (opts.scope !== 'global') return;
-  const pluginDir = path.join(HOME, '.gemini', 'config', 'plugins', 'dbtools');
+function installAntigravityPlugin(suite) {
+  if (opts.scope !== 'global' || !suite.pluginName) return;
+  const pluginDir = path.join(HOME, '.gemini', 'config', 'plugins', suite.pluginName);
   const manifestFile = path.join(pluginDir, 'plugin.json');
   const manifest = JSON.stringify({
-    name: 'dbtools',
+    name: suite.pluginName,
     version: '1.0.0',
-    description: 'SQL Server Standard/Enterprise suite with 5 specialized skills and orchestrator persona'
+    description: suite.pluginDesc
   }, null, 2) + '\n';
 
   if (opts.overwrite || !fs.existsSync(manifestFile)) {
@@ -423,13 +487,13 @@ function installAntigravityPlugin() {
     try {
       const cfg = JSON.parse(fs.readFileSync(configJsonPath, 'utf8'));
       if (!cfg.plugins) cfg.plugins = {};
-      if (!cfg.plugins.dbtools || !cfg.plugins.dbtools.enabled) {
-        cfg.plugins.dbtools = { enabled: true };
+      if (!cfg.plugins[suite.pluginName] || !cfg.plugins[suite.pluginName].enabled) {
+        cfg.plugins[suite.pluginName] = { enabled: true };
         if (opts.dryRun) {
-          console.log(`  config.json -> habilitar plugin dbtools en ${configJsonPath}`);
+          console.log(`  config.json -> habilitar plugin ${suite.pluginName} en ${configJsonPath}`);
         } else {
           fs.writeFileSync(configJsonPath, JSON.stringify(cfg, null, 2) + '\n');
-          console.log(`  config.json -> habilitado plugin dbtools en ${configJsonPath}`);
+          console.log(`  config.json -> habilitado plugin ${suite.pluginName} en ${configJsonPath}`);
         }
       }
     } catch (e) {
@@ -438,48 +502,48 @@ function installAntigravityPlugin() {
   }
 }
 
-function installSkills(tool, toolId) {
+function installSkills(tool, toolId, suite) {
   const dst = tool.skillsDir();
-  if (!fs.existsSync(SKILLS_SRC)) {
-    console.log(`  [aviso] no existe ${SKILLS_SRC}`);
+  if (!fs.existsSync(suite.skillsDir)) {
     return 0;
   }
-  const results = copyDirRecursive(SKILLS_SRC, dst, opts.overwrite);
-  console.log(`  skills -> ${dst}  (${results.length} archivos)`);
+  const results = copyDirRecursive(suite.skillsDir, dst, opts.overwrite);
+  if (results.length > 0) {
+    console.log(`  skills (${suite.name}) -> ${dst}  (${results.length} archivos)`);
+  }
 
   // Para Antigravity en modo global: copiar también a ~/.gemini/skills y ~/.gemini/antigravity-cli/skills
-  if (toolId === 'antigravity' && opts.scope === 'global') {
+  if (toolId === 'antigravity' && opts.scope === 'global' && results.length > 0) {
     const sharedSkills = path.join(HOME, '.gemini', 'skills');
-    copyDirRecursive(SKILLS_SRC, sharedSkills, opts.overwrite);
+    copyDirRecursive(suite.skillsDir, sharedSkills, opts.overwrite);
     const cliSkills = path.join(HOME, '.gemini', 'antigravity-cli', 'skills');
     if (fs.existsSync(path.join(HOME, '.gemini', 'antigravity-cli'))) {
-      copyDirRecursive(SKILLS_SRC, cliSkills, opts.overwrite);
+      copyDirRecursive(suite.skillsDir, cliSkills, opts.overwrite);
     }
   }
 
   // Para Claude en modo global: copiar también a las carpetas de Claude Desktop en Windows
-  if (toolId === 'claude' && opts.scope === 'global') {
+  if (toolId === 'claude' && opts.scope === 'global' && results.length > 0) {
     for (const d of getClaudeDesktopDirs()) {
       const desktopSkills = path.join(d, 'skills');
-      copyDirRecursive(SKILLS_SRC, desktopSkills, opts.overwrite);
-      console.log(`  skills (Claude Desktop) -> ${desktopSkills}`);
+      copyDirRecursive(suite.skillsDir, desktopSkills, opts.overwrite);
+      console.log(`  skills (${suite.name} Claude Desktop) -> ${desktopSkills}`);
     }
   }
 
   return results.length;
 }
 
-function installAgents(tool, toolId) {
+function installAgents(tool, toolId, suite) {
   if (!tool.hasAgents) return 0;
   const dst = tool.agentsDir();
-  if (!fs.existsSync(AGENTS_SRC)) {
-    console.log(`  [aviso] no existe ${AGENTS_SRC}`);
+  if (!fs.existsSync(suite.agentsDir)) {
     return 0;
   }
   let count = 0;
-  for (const f of fs.readdirSync(AGENTS_SRC)) {
+  for (const f of fs.readdirSync(suite.agentsDir)) {
     if (!f.endsWith('.md')) continue;
-    const src = path.join(AGENTS_SRC, f);
+    const src = path.join(suite.agentsDir, f);
     const name = f.replace(/\.md$/, '');
 
     if (tool.antigravityFormat) {
@@ -518,7 +582,7 @@ function installAgents(tool, toolId) {
     }
 
     if (tool.codexFormat) {
-      // Codex: subagentes y orquestador (dbtools) en formato TOML
+      // Codex: subagentes y orquestador en formato TOML
       const outToml = path.join(dst, name + '.toml');
       if (!opts.overwrite && fs.existsSync(outToml)) { count++; continue; }
       if (!opts.dryRun) {
@@ -559,7 +623,7 @@ function installAgents(tool, toolId) {
   }
 
   // Activar multi_agent en ~/.codex/config.toml si es codex
-  if (toolId === 'codex' && opts.scope === 'global') {
+  if (toolId === 'codex' && opts.scope === 'global' && count > 0) {
     const codexCfg = path.join(HOME, '.codex', 'config.toml');
     if (fs.existsSync(codexCfg) && !opts.dryRun) {
       try {
@@ -577,38 +641,41 @@ function installAgents(tool, toolId) {
     }
   }
 
-  console.log(`  agents -> ${dst}  (${count} agentes)`);
+  if (count > 0) {
+    console.log(`  agents (${suite.name}) -> ${dst}  (${count} agentes)`);
+  }
   return count;
 }
 
-function installContext(tool, toolId) {
+function installContext(tool, toolId, suite) {
   if (typeof tool.contextFile !== 'function') return 0;
+  if (!suite.personaFile || !fs.existsSync(suite.personaFile)) return 0;
   const file = tool.contextFile();
   if (!file) return 0;
-  const content = personaContent();
+  const content = fs.readFileSync(suite.personaFile, 'utf8');
   if (!content) return 0;
-  const block = `<!-- dbtools (instalado por dbtools-portable/install.js) -->\n\n${content}\n`;
-  if (!opts.overwrite && fs.existsSync(file)) { console.log(`  contexto -> ${file}  (omitido, ya existe)`); return 0; }
-  if (opts.dryRun) { console.log(`  contexto -> ${file}`); return 1; }
+  const block = `<!-- ${suite.name} (instalado por dbAgents/install.js) -->\n\n${content}\n`;
+  if (!opts.overwrite && fs.existsSync(file)) { console.log(`  contexto (${suite.name}) -> ${file}  (omitido, ya existe)`); return 0; }
+  if (opts.dryRun) { console.log(`  contexto (${suite.name}) -> ${file}`); return 1; }
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, block);
-  console.log(`  contexto -> ${file}`);
+  console.log(`  contexto (${suite.name}) -> ${file}`);
 
   if (toolId === 'claude' && opts.scope === 'global') {
     for (const d of getClaudeDesktopDirs()) {
       const dContext = path.join(d, 'CLAUDE.md');
       fs.mkdirSync(path.dirname(dContext), { recursive: true });
       fs.writeFileSync(dContext, block);
-      console.log(`  contexto (Claude Desktop) -> ${dContext}`);
+      console.log(`  contexto (${suite.name} Claude Desktop) -> ${dContext}`);
     }
   }
 
   return 1;
 }
 
-function uninstallAntigravityPlugin() {
-  if (opts.scope !== 'global') return;
-  const pluginDir = path.join(HOME, '.gemini', 'config', 'plugins', 'dbtools');
+function uninstallAntigravityPlugin(suite) {
+  if (opts.scope !== 'global' || !suite.pluginName) return;
+  const pluginDir = path.join(HOME, '.gemini', 'config', 'plugins', suite.pluginName);
   if (fs.existsSync(pluginDir)) {
     if (opts.dryRun) {
       console.log(`  plugin -> eliminar directorio ${pluginDir}`);
@@ -626,13 +693,13 @@ function uninstallAntigravityPlugin() {
   if (fs.existsSync(configJsonPath)) {
     try {
       const cfg = JSON.parse(fs.readFileSync(configJsonPath, 'utf8'));
-      if (cfg.plugins && cfg.plugins.dbtools) {
+      if (cfg.plugins && cfg.plugins[suite.pluginName]) {
         if (opts.dryRun) {
-          console.log(`  config.json -> remover plugin dbtools de ${configJsonPath}`);
+          console.log(`  config.json -> remover plugin ${suite.pluginName} de ${configJsonPath}`);
         } else {
-          delete cfg.plugins.dbtools;
+          delete cfg.plugins[suite.pluginName];
           fs.writeFileSync(configJsonPath, JSON.stringify(cfg, null, 2) + '\n');
-          console.log(`  config.json -> removido plugin dbtools de ${configJsonPath}`);
+          console.log(`  config.json -> removido plugin ${suite.pluginName} de ${configJsonPath}`);
         }
       }
     } catch (e) {
@@ -641,8 +708,9 @@ function uninstallAntigravityPlugin() {
   }
 }
 
-function uninstallSkills(tool, toolId) {
-  const skillNames = getDbtoolsSkillNames();
+function uninstallSkills(tool, toolId, suite) {
+  const skillNames = getSuiteSkillNames(suite.name);
+  if (skillNames.length === 0) return 0;
   const dirs = [tool.skillsDir()];
 
   if (toolId === 'antigravity' && opts.scope === 'global') {
@@ -664,11 +732,11 @@ function uninstallSkills(tool, toolId) {
       const target = path.join(dir, name);
       if (fs.existsSync(target)) {
         if (opts.dryRun) {
-          console.log(`  skills -> eliminar ${target}`);
+          console.log(`  skills (${suite.name}) -> eliminar ${target}`);
         } else {
           try {
             fs.rmSync(target, { recursive: true, force: true });
-            console.log(`  skills -> eliminado ${target}`);
+            console.log(`  skills (${suite.name}) -> eliminado ${target}`);
           } catch (e) {
             console.log(`  [error] no se pudo eliminar ${target}: ${e.message}`);
           }
@@ -678,15 +746,13 @@ function uninstallSkills(tool, toolId) {
     }
   }
 
-  if (count === 0) {
-    console.log(`  skills -> (ninguna skill de dbtools encontrada)`);
-  }
   return count;
 }
 
-function uninstallAgents(tool, toolId) {
+function uninstallAgents(tool, toolId, suite) {
   if (!tool.hasAgents) return 0;
-  const agentNames = getDbtoolsAgentNames();
+  const agentNames = getSuiteAgentNames(suite.name);
+  if (agentNames.length === 0) return 0;
   const dst = tool.agentsDir();
   let count = 0;
 
@@ -703,11 +769,11 @@ function uninstallAgents(tool, toolId) {
         const agentFolder = path.join(dir, name);
         if (fs.existsSync(agentFolder)) {
           if (opts.dryRun) {
-            console.log(`  agents -> eliminar ${agentFolder}`);
+            console.log(`  agents (${suite.name}) -> eliminar ${agentFolder}`);
           } else {
             try {
               fs.rmSync(agentFolder, { recursive: true, force: true });
-              console.log(`  agents -> eliminado ${agentFolder}`);
+              console.log(`  agents (${suite.name}) -> eliminado ${agentFolder}`);
             } catch (e) {
               console.log(`  [error] no se pudo eliminar ${agentFolder}: ${e.message}`);
             }
@@ -719,17 +785,17 @@ function uninstallAgents(tool, toolId) {
   } else if (tool.codexFormat) {
     if (fs.existsSync(dst)) {
       const files = agentNames.map((n) => n + '.toml');
-      files.push('sql-server-dbtools.toml');
+      if (suite.name === 'dbtools') files.push('sql-server-dbtools.toml');
 
       for (const f of files) {
         const target = path.join(dst, f);
         if (fs.existsSync(target)) {
           if (opts.dryRun) {
-            console.log(`  agents -> eliminar ${target}`);
+            console.log(`  agents (${suite.name}) -> eliminar ${target}`);
           } else {
             try {
               fs.rmSync(target, { force: true });
-              console.log(`  agents -> eliminado ${target}`);
+              console.log(`  agents (${suite.name}) -> eliminado ${target}`);
             } catch (e) {
               console.log(`  [error] no se pudo eliminar ${target}: ${e.message}`);
             }
@@ -754,11 +820,11 @@ function uninstallAgents(tool, toolId) {
         const target = path.join(dir, name + '.md');
         if (fs.existsSync(target)) {
           if (opts.dryRun) {
-            console.log(`  agents -> eliminar ${target}`);
+            console.log(`  agents (${suite.name}) -> eliminar ${target}`);
           } else {
             try {
               fs.rmSync(target, { force: true });
-              console.log(`  agents -> eliminado ${target}`);
+              console.log(`  agents (${suite.name}) -> eliminado ${target}`);
             } catch (e) {
               console.log(`  [error] no se pudo eliminar ${target}: ${e.message}`);
             }
@@ -769,13 +835,10 @@ function uninstallAgents(tool, toolId) {
     }
   }
 
-  if (count === 0) {
-    console.log(`  agents -> (ningún agente de dbtools encontrado)`);
-  }
   return count;
 }
 
-function uninstallContext(tool, toolId) {
+function uninstallContext(tool, toolId, suite) {
   if (typeof tool.contextFile !== 'function') return 0;
   const file = tool.contextFile();
   let count = 0;
@@ -789,26 +852,28 @@ function uninstallContext(tool, toolId) {
     }
   }
 
+  const prefix = `<!-- ${suite.name}`;
   for (const f of filesToCheck) {
     if (!fs.existsSync(f)) continue;
     try {
       const content = fs.readFileSync(f, 'utf8');
-      if (content.includes('<!-- dbtools')) {
-        const cleaned = content.replace(/<!-- dbtools[\s\S]*?(?:$|(?=\n<!-- [^d]))/, '').trim();
+      if (content.includes(prefix)) {
+        const pattern = new RegExp(`${prefix}[\\s\\S]*?(?:$|(?=\\n<!-- [^${suite.name.charAt(0)}]))`);
+        const cleaned = content.replace(pattern, '').trim();
         if (cleaned.length === 0) {
           if (opts.dryRun) {
-            console.log(`  contexto -> eliminar ${f}`);
+            console.log(`  contexto (${suite.name}) -> eliminar ${f}`);
           } else {
             fs.rmSync(f, { force: true });
-            console.log(`  contexto -> eliminado ${f}`);
+            console.log(`  contexto (${suite.name}) -> eliminado ${f}`);
           }
           count++;
         } else {
           if (opts.dryRun) {
-            console.log(`  contexto -> limpiar bloque dbtools en ${f}`);
+            console.log(`  contexto (${suite.name}) -> limpiar bloque en ${f}`);
           } else {
             fs.writeFileSync(f, cleaned + '\n');
-            console.log(`  contexto -> limpiado bloque dbtools en ${f}`);
+            console.log(`  contexto (${suite.name}) -> limpiado bloque en ${f}`);
           }
           count++;
         }
@@ -818,9 +883,6 @@ function uninstallContext(tool, toolId) {
     }
   }
 
-  if (count === 0) {
-    console.log(`  contexto -> (ningún archivo de contexto de dbtools encontrado)`);
-  }
   return count;
 }
 
@@ -829,7 +891,8 @@ function uninstallContext(tool, toolId) {
 // ---------------------------------------------------------------------------
 const opts = parseArgs(process.argv.slice(2));
 
-console.log(`\ndbtools — ${opts.uninstall ? 'desinstalador' : 'instalador'} portable`);
+console.log(`\ndbAgents — ${opts.uninstall ? 'desinstalador' : 'instalador'} portable`);
+console.log(`Suites:  ${opts.suites.map((s) => SUITES[s].label).join(', ')}`);
 console.log(`Alcance: ${opts.scope === 'project' ? `proyecto (${opts.projectDir})` : 'global (usuario ' + HOME + ')'}`);
 console.log(`Modo:    ${opts.dryRun ? 'SIMULACIÓN (--dry-run)' : 'real'}`);
 console.log(`Targets: ${opts.targets.map((t) => TOOLS[t].label).join(', ')}`);
@@ -839,12 +902,15 @@ if (opts.uninstall) {
   for (const id of opts.targets) {
     const tool = TOOLS[id];
     console.log(`== Desinstalando de ${tool.label} ==`);
-    if (id === 'antigravity' && tool.isPlugin) {
-      uninstallAntigravityPlugin();
+    for (const suiteKey of opts.suites) {
+      const suite = SUITES[suiteKey];
+      if (id === 'antigravity' && tool.isPlugin) {
+        uninstallAntigravityPlugin(suite);
+      }
+      uninstallSkills(tool, id, suite);
+      uninstallAgents(tool, id, suite);
+      uninstallContext(tool, id, suite);
     }
-    uninstallSkills(tool, id);
-    uninstallAgents(tool, id);
-    uninstallContext(tool, id);
     console.log('');
   }
   console.log('Desinstalación finalizada.\n');
@@ -854,15 +920,18 @@ if (opts.uninstall) {
 for (const id of opts.targets) {
   const tool = TOOLS[id];
   console.log(`== ${tool.label} ==`);
-  if (id === 'antigravity' && tool.isPlugin) {
-    installAntigravityPlugin();
+  for (const suiteKey of opts.suites) {
+    const suite = SUITES[suiteKey];
+    if (id === 'antigravity' && tool.isPlugin) {
+      installAntigravityPlugin(suite);
+    }
+    installSkills(tool, id, suite);
+    installAgents(tool, id, suite);
+    installContext(tool, id, suite);
   }
-  installSkills(tool, id);
-  installAgents(tool, id);
-  installContext(tool, id);
   console.log(`  (recarga: ${tool.reloadNote})`);
   console.log('');
 }
 
-console.log('Listo. Regla inquebrantable: solo lectura (SELECT + catálogo + DMVs).');
-console.log('Usa cuentas de solo lectura (db_datareader/SELECT, ApplicationIntent=ReadOnly).\n');
+console.log('Listo. Regla inquebrantable: solo lectura y análisis no destructivo.');
+console.log('Todas las sugerencias se generan como scripts o documentación para el usuario.\n');

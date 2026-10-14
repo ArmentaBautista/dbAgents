@@ -30,12 +30,13 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const readline = require('readline');
 
 const BUNDLE_DIR = __dirname;
 const ROOT_DIR = path.resolve(BUNDLE_DIR, '..');
 const HOME = os.homedir();
 
-const KNOWN_TARGETS = ['opencode', 'kilocode', 'claude', 'gemini', 'codex', 'antigravity', 'copilot'];
+const KNOWN_TARGETS = ['antigravity', 'opencode', 'kilocode', 'copilot', 'claude', 'gemini', 'codex'];
 const KNOWN_SUITES = ['dbtools', 'softarch', 'all'];
 
 const SUITES = {
@@ -45,6 +46,7 @@ const SUITES = {
     skillsDir: path.join(BUNDLE_DIR, 'skills'),
     agentsDir: path.join(BUNDLE_DIR, 'agents'),
     personaFile: path.join(BUNDLE_DIR, 'orchestrator-prompt.md'),
+    ruleFileName: 'dbtools.md',
     pluginName: 'dbtools',
     pluginDesc: 'SQL Server Standard/Enterprise suite with 5 specialized skills and orchestrator persona',
     knownSkills: [
@@ -69,7 +71,8 @@ const SUITES = {
     label: 'softarch (Software Archaeologist)',
     skillsDir: path.join(ROOT_DIR, 'softarch', 'skills'),
     agentsDir: path.join(ROOT_DIR, 'softarch', 'agents'),
-    personaFile: null,
+    personaFile: path.join(ROOT_DIR, 'softarch', 'agents', 'softarch.md'),
+    ruleFileName: 'software-archeologist.md',
     pluginName: 'softarch',
     pluginDesc: 'Software Archaeologist for legacy code investigation, intent recovery and risk analysis',
     knownSkills: [],
@@ -117,6 +120,7 @@ Uso:
 targets:  opencode | kilocode | claude | gemini | codex | antigravity | copilot | all   (por defecto: all)
 
 opciones:
+  --interactive, -i   modo interactivo guiado paso a paso (por defecto si no hay argumentos)
   --suite <name>      suite a instalar: dbtools | softarch | all (por defecto: all)
   --global            instalar/desinstalar a nivel de usuario (por defecto)
   --project <dir>     instalar/desinstalar dentro de un proyecto
@@ -126,8 +130,11 @@ opciones:
   --help, -h          esta ayuda
 
 Ejemplos:
-  node install.js                       # instalar todas las suites, global
+  node install.js                       # modo interactivo guiado
+  node install.js -i                    # forzar modo interactivo
+  node install.js all                   # instalar todas las suites en todas las tools
   node install.js copilot               # instalar en GitHub Copilot
+  node install.js antigravity           # instalar en Google Antigravity
   node install.js --suite softarch      # instalar solo el agente softarch
   node install.js --suite dbtools       # instalar solo el equipo dbtools SQL Server
   node install.js claude -u             # desinstalar todo de Claude
@@ -137,11 +144,12 @@ Ejemplos:
 }
 
 function parseArgs(argv) {
-  const opts = { targets: [], suites: [], scope: 'global', projectDir: null, dryRun: false, overwrite: true, uninstall: false };
+  const opts = { targets: [], suites: [], scope: 'global', projectDir: null, dryRun: false, overwrite: true, uninstall: false, interactive: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === 'all') opts.targets = KNOWN_TARGETS.slice();
     else if (a === 'uninstall' || a === '--uninstall' || a === '-u') opts.uninstall = true;
+    else if (a === '--interactive' || a === '-i') opts.interactive = true;
     else if (a === 'copilot' || a === 'github-copilot') {
       if (!opts.targets.includes('copilot')) opts.targets.push('copilot');
     }
@@ -166,6 +174,8 @@ function parseArgs(argv) {
   if (opts.suites.length === 0) opts.suites = ['dbtools', 'softarch'];
   return opts;
 }
+
+let opts = null;
 
 // ---------------------------------------------------------------------------
 // Utilidades de copia
@@ -338,13 +348,15 @@ const TOOLS = {
   antigravity: {
     label: 'Antigravity (Google)',
     // Antigravity: en modo proyecto instala en .agents/skills/, .agents/agents/ y AGENTS.md.
-    // A nivel global se instala como Plugin nativo en ~/.gemini/config/plugins/dbtools/
+    // A nivel global se instala como Plugin en ~/.gemini/config/plugins/{suite}/
     // y los agentes en ~/.gemini/config/agents/{name}/agent.md.
+    // También instala las rules en ~/.gemini/config/rules/{ruleFileName}.
     isPlugin: true,
-    skillsDir() {
+    skillsDir(suite) {
+      const suiteName = suite && suite.name ? suite.name : 'dbtools';
       return opts.scope === 'project'
         ? path.join(opts.projectDir, '.agents', 'skills')
-        : path.join(HOME, '.gemini', 'config', 'plugins', 'dbtools', 'skills');
+        : path.join(HOME, '.gemini', 'config', 'plugins', suiteName, 'skills');
     },
     agentsDir() {
       return opts.scope === 'project'
@@ -355,10 +367,11 @@ const TOOLS = {
     antigravityFormat: true,
     codexFormat: false,
     claudeFormat: false,
-    contextFile() {
-      return opts.scope === 'project'
-        ? path.join(opts.projectDir, 'AGENTS.md')
-        : path.join(HOME, '.gemini', 'config', 'plugins', 'dbtools', 'rules', 'AGENTS.md');
+    contextFile(suite) {
+      if (opts.scope === 'project') return path.join(opts.projectDir, 'AGENTS.md');
+      const suiteName = suite && suite.name ? suite.name : 'dbtools';
+      const ruleName = (suite && suite.ruleFileName) ? suite.ruleFileName : (suiteName === 'softarch' ? 'software-archeologist.md' : 'dbtools.md');
+      return path.join(HOME, '.gemini', 'config', 'rules', ruleName);
     },
     reloadNote: 'Usa /agents o inicia una conversación para ver los agentes y skills.',
   },
@@ -650,16 +663,16 @@ function installAgents(tool, toolId, suite) {
 function installContext(tool, toolId, suite) {
   if (typeof tool.contextFile !== 'function') return 0;
   if (!suite.personaFile || !fs.existsSync(suite.personaFile)) return 0;
-  const file = tool.contextFile();
+  const file = tool.contextFile(suite);
   if (!file) return 0;
   const content = fs.readFileSync(suite.personaFile, 'utf8');
   if (!content) return 0;
   const block = `<!-- ${suite.name} (instalado por dbAgents/install.js) -->\n\n${content}\n`;
-  if (!opts.overwrite && fs.existsSync(file)) { console.log(`  contexto (${suite.name}) -> ${file}  (omitido, ya existe)`); return 0; }
-  if (opts.dryRun) { console.log(`  contexto (${suite.name}) -> ${file}`); return 1; }
+  if (!opts.overwrite && fs.existsSync(file)) { console.log(`  contexto/regla (${suite.name}) -> ${file}  (omitido, ya existe)`); return 0; }
+  if (opts.dryRun) { console.log(`  contexto/regla (${suite.name}) -> ${file}`); return 1; }
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, block);
-  console.log(`  contexto (${suite.name}) -> ${file}`);
+  console.log(`  contexto/regla (${suite.name}) -> ${file}`);
 
   if (toolId === 'claude' && opts.scope === 'global') {
     for (const d of getClaudeDesktopDirs()) {
@@ -840,7 +853,7 @@ function uninstallAgents(tool, toolId, suite) {
 
 function uninstallContext(tool, toolId, suite) {
   if (typeof tool.contextFile !== 'function') return 0;
-  const file = tool.contextFile();
+  const file = tool.contextFile(suite);
   let count = 0;
 
   const filesToCheck = [];
@@ -887,51 +900,150 @@ function uninstallContext(tool, toolId, suite) {
 }
 
 // ---------------------------------------------------------------------------
+// Menú interactivo
+// ---------------------------------------------------------------------------
+function askQuestion(rl, query) {
+  return new Promise((resolve) => rl.question(query, resolve));
+}
+
+async function promptInteractive(parsedOpts) {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  console.log('======================================================');
+  console.log('       dbAgents — Instalador Interactivo Multi-Suite  ');
+  console.log('======================================================\n');
+
+  console.log('1. Selecciona qué agente o suite deseas instalar:');
+  console.log('   [1] dbtools (SQL Server Suite — 1 orquestador + 5 especialistas + 6 skills)');
+  console.log('   [2] softarch (Software Archaeologist — Arqueología y análisis no destructivo)');
+  console.log('   [3] Todas las suites (dbtools + softarch)');
+  
+  const suiteChoice = (await askQuestion(rl, '\nElige una opción [1-3] (por defecto: 3): ')).trim();
+  let selectedSuites = ['dbtools', 'softarch'];
+  if (suiteChoice === '1') {
+    selectedSuites = ['dbtools'];
+  } else if (suiteChoice === '2') {
+    selectedSuites = ['softarch'];
+  }
+
+  console.log('\n2. Selecciona el Harness / Entorno de IA destino:');
+  KNOWN_TARGETS.forEach((t, idx) => {
+    console.log(`   [${idx + 1}] ${TOOLS[t].label} (${t})`);
+  });
+  console.log(`   [${KNOWN_TARGETS.length + 1}] Todos los soportados`);
+
+  const targetChoice = (await askQuestion(rl, `\nElige número(s) separados por coma o espacio (por defecto: ${KNOWN_TARGETS.length + 1}): `)).trim();
+  let selectedTargets = [];
+  if (!targetChoice || targetChoice === String(KNOWN_TARGETS.length + 1) || targetChoice.toLowerCase() === 'all') {
+    selectedTargets = KNOWN_TARGETS.slice();
+  } else {
+    const parts = targetChoice.split(/[\s,]+/);
+    for (const p of parts) {
+      const num = parseInt(p, 10);
+      if (num >= 1 && num <= KNOWN_TARGETS.length) {
+        const id = KNOWN_TARGETS[num - 1];
+        if (!selectedTargets.includes(id)) selectedTargets.push(id);
+      } else if (KNOWN_TARGETS.includes(p.toLowerCase())) {
+        if (!selectedTargets.includes(p.toLowerCase())) selectedTargets.push(p.toLowerCase());
+      }
+    }
+  }
+  if (selectedTargets.length === 0) selectedTargets = KNOWN_TARGETS.slice();
+
+  console.log('\n3. Alcance de instalación:');
+  console.log('   [1] Global (carpeta de usuario ' + HOME + ')');
+  console.log('   [2] Proyecto actual (' + process.cwd() + ')');
+
+  const scopeChoice = (await askQuestion(rl, '\nElige alcance [1-2] (por defecto: 1): ')).trim();
+  let selectedScope = 'global';
+  let projectDir = null;
+  if (scopeChoice === '2') {
+    selectedScope = 'project';
+    projectDir = process.cwd();
+  }
+
+  console.log('\n4. Acción:');
+  console.log('   [1] Instalar');
+  console.log('   [2] Desinstalar');
+
+  const actionChoice = (await askQuestion(rl, '\nElige acción [1-2] (por defecto: 1): ')).trim();
+  const uninstall = (actionChoice === '2');
+
+  rl.close();
+
+  parsedOpts.suites = selectedSuites;
+  parsedOpts.targets = selectedTargets;
+  parsedOpts.scope = selectedScope;
+  parsedOpts.projectDir = projectDir;
+  parsedOpts.uninstall = uninstall;
+  return parsedOpts;
+}
+
+// ---------------------------------------------------------------------------
 // main
 // ---------------------------------------------------------------------------
-const opts = parseArgs(process.argv.slice(2));
+async function main() {
+  opts = parseArgs(process.argv.slice(2));
 
-console.log(`\ndbAgents — ${opts.uninstall ? 'desinstalador' : 'instalador'} portable`);
-console.log(`Suites:  ${opts.suites.map((s) => SUITES[s].label).join(', ')}`);
-console.log(`Alcance: ${opts.scope === 'project' ? `proyecto (${opts.projectDir})` : 'global (usuario ' + HOME + ')'}`);
-console.log(`Modo:    ${opts.dryRun ? 'SIMULACIÓN (--dry-run)' : 'real'}`);
-console.log(`Targets: ${opts.targets.map((t) => TOOLS[t].label).join(', ')}`);
-console.log('');
+  // Si no se pasaron argumentos de CLI por terminal y stdin es interactivo (TTY)
+  // o si se solicitó explícitamente con -i / --interactive
+  const hasExplicitArgs = process.argv.slice(2).some((a) => !a.startsWith('--dry-run') && !a.startsWith('--help') && a !== '-h');
+  const isExplicitInteractive = process.argv.includes('--interactive') || process.argv.includes('-i');
 
-if (opts.uninstall) {
+  if (isExplicitInteractive || (!hasExplicitArgs && process.stdin.isTTY)) {
+    opts = await promptInteractive(opts);
+  }
+
+  console.log(`\ndbAgents — ${opts.uninstall ? 'desinstalador' : 'instalador'} portable`);
+  console.log(`Suites:  ${opts.suites.map((s) => SUITES[s].label).join(', ')}`);
+  console.log(`Alcance: ${opts.scope === 'project' ? `proyecto (${opts.projectDir})` : 'global (usuario ' + HOME + ')'}`);
+  console.log(`Modo:    ${opts.dryRun ? 'SIMULACIÓN (--dry-run)' : 'real'}`);
+  console.log(`Targets: ${opts.targets.map((t) => TOOLS[t].label).join(', ')}`);
+  console.log('');
+
+  if (opts.uninstall) {
+    for (const id of opts.targets) {
+      const tool = TOOLS[id];
+      console.log(`== Desinstalando de ${tool.label} ==`);
+      for (const suiteKey of opts.suites) {
+        const suite = SUITES[suiteKey];
+        if (id === 'antigravity' && tool.isPlugin) {
+          uninstallAntigravityPlugin(suite);
+        }
+        uninstallSkills(tool, id, suite);
+        uninstallAgents(tool, id, suite);
+        uninstallContext(tool, id, suite);
+      }
+      console.log('');
+    }
+    console.log('Desinstalación finalizada.\n');
+    process.exit(0);
+  }
+
   for (const id of opts.targets) {
     const tool = TOOLS[id];
-    console.log(`== Desinstalando de ${tool.label} ==`);
+    console.log(`== ${tool.label} ==`);
     for (const suiteKey of opts.suites) {
       const suite = SUITES[suiteKey];
       if (id === 'antigravity' && tool.isPlugin) {
-        uninstallAntigravityPlugin(suite);
+        installAntigravityPlugin(suite);
       }
-      uninstallSkills(tool, id, suite);
-      uninstallAgents(tool, id, suite);
-      uninstallContext(tool, id, suite);
+      installSkills(tool, id, suite);
+      installAgents(tool, id, suite);
+      installContext(tool, id, suite);
     }
+    console.log(`  (recarga: ${tool.reloadNote})`);
     console.log('');
   }
-  console.log('Desinstalación finalizada.\n');
-  process.exit(0);
+
+  console.log('Listo. Regla inquebrantable: solo lectura y análisis no destructivo.');
+  console.log('Todas las sugerencias se generan como scripts o documentación para el usuario.\n');
 }
 
-for (const id of opts.targets) {
-  const tool = TOOLS[id];
-  console.log(`== ${tool.label} ==`);
-  for (const suiteKey of opts.suites) {
-    const suite = SUITES[suiteKey];
-    if (id === 'antigravity' && tool.isPlugin) {
-      installAntigravityPlugin(suite);
-    }
-    installSkills(tool, id, suite);
-    installAgents(tool, id, suite);
-    installContext(tool, id, suite);
-  }
-  console.log(`  (recarga: ${tool.reloadNote})`);
-  console.log('');
-}
-
-console.log('Listo. Regla inquebrantable: solo lectura y análisis no destructivo.');
-console.log('Todas las sugerencias se generan como scripts o documentación para el usuario.\n');
+main().catch((err) => {
+  console.error('\n[ERROR]', err);
+  process.exit(1);
+});

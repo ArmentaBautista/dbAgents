@@ -105,13 +105,17 @@ curl -fsSL https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/insta
 git clone https://github.com/ArmentaBautista/dbAgents.git
 cd dbAgents/dbtools
 
-# Instalación
-node install.js                        # todas las suites, global (usuario)
+# Modo Interactivo (Asistente paso a paso):
+node install.js                        # abre el menú interactivo para elegir suite, harness y alcance
+node install.js -i                     # forzar modo interactivo
+
+# Modo Directo / CLI:
+node install.js all                    # todas las suites en todas las tools
 node install.js --suite softarch       # solo suite softarch
 node install.js --suite dbtools        # solo suite dbtools SQL Server
+node install.js antigravity copilot    # solo Antigravity y GitHub Copilot
 node install.js opencode kilocode      # solo esas dos herramientas
-node install.js codex antigravity      # Codex CLI y Antigravity
-node install.js --project .            # todo, dentro del proyecto actual
+node install.js --project .            # dentro del proyecto actual
 node install.js --dry-run              # previsualizar sin escribir
 node install.js --no-overwrite         # no sobrescribir archivos existentes
 
@@ -125,6 +129,7 @@ node install.js --project . -u         # desinstalar del proyecto actual
 
 | Flag | Efecto |
 |---|---|
+| `--interactive`, `-i` | lanza el menú interactivo guiado (por defecto si no se indican argumentos) |
 | `--suite <name>` | suite a instalar/desinstalar: `dbtools`, `softarch` o `all` (por defecto: `all`) |
 | `--global` (por defecto) | instala/desinstala en la carpeta de usuario de cada tool |
 | `--project <dir>` | instala/desinstala dentro de un proyecto |

@@ -37,7 +37,7 @@ const ROOT_DIR = path.resolve(BUNDLE_DIR, '..');
 const HOME = os.homedir();
 
 const KNOWN_TARGETS = ['antigravity', 'opencode', 'kilocode', 'copilot', 'claude', 'gemini', 'codex'];
-const KNOWN_SUITES = ['dbtools', 'softarch', 'all'];
+const KNOWN_SUITES = ['dbtools', 'softarch', 'softeng', 'all'];
 
 const SUITES = {
   dbtools: {
@@ -77,6 +77,23 @@ const SUITES = {
     pluginDesc: 'Software Archaeologist for legacy code investigation, intent recovery and risk analysis',
     knownSkills: ['softarch'],
     knownAgents: ['softarch'],
+  },
+  softeng: {
+    name: 'softeng',
+    label: 'softeng (Software Engineering & Architecture)',
+    skillsDir: path.join(ROOT_DIR, 'softeng', 'skills'),
+    agentsDir: path.join(ROOT_DIR, 'softeng', 'agents'),
+    personaFile: path.join(ROOT_DIR, 'softeng', 'agents', 'softeng.md'),
+    ruleFileName: 'softeng.md',
+    pluginName: 'softeng',
+    pluginDesc: 'Software Engineering & Architecture agent with vertical slice, agnostic stacks, design patterns, and OWASP/NIST security',
+    knownSkills: [
+      'softeng',
+      'arquitectura-agnostica',
+      'vertical-slice',
+      'seguridad-owasp-nist',
+    ],
+    knownAgents: ['softeng'],
   },
 };
 
@@ -121,7 +138,7 @@ targets:  opencode | kilocode | claude | gemini | codex | antigravity | copilot 
 
 opciones:
   --interactive, -i   modo interactivo guiado paso a paso (por defecto si no hay argumentos)
-  --suite <name>      suite a instalar: dbtools | softarch | all (por defecto: all)
+  --suite <name>      suite a instalar: dbtools | softarch | softeng | all (por defecto: all)
   --global            instalar/desinstalar a nivel de usuario (por defecto)
   --project <dir>     instalar/desinstalar dentro de un proyecto
   --uninstall, -u     desinstalar skills, agentes y configuración
@@ -135,10 +152,11 @@ Ejemplos:
   node install.js all                   # instalar todas las suites en todas las tools
   node install.js copilot               # instalar en GitHub Copilot
   node install.js antigravity           # instalar en Google Antigravity
+  node install.js --suite softeng       # instalar solo la suite softeng
   node install.js --suite softarch      # instalar solo el agente softarch
   node install.js --suite dbtools       # instalar solo el equipo dbtools SQL Server
   node install.js claude -u             # desinstalar todo de Claude
-  node install.js --suite softarch -u   # desinstalar solo softarch
+  node install.js --suite softeng -u    # desinstalar solo softeng
   node install.js --project .           # instalar en proyecto actual
 `);
 }
@@ -156,11 +174,11 @@ function parseArgs(argv) {
     else if (KNOWN_TARGETS.includes(a)) { if (!opts.targets.includes(a)) opts.targets.push(a); }
     else if (a === '--suite') {
       const suiteVal = argv[++i];
-      if (suiteVal === 'all') opts.suites = ['dbtools', 'softarch'];
+      if (suiteVal === 'all') opts.suites = ['dbtools', 'softarch', 'softeng'];
       else if (KNOWN_SUITES.includes(suiteVal)) opts.suites.push(suiteVal);
       else { console.error('Suite desconocida: ' + suiteVal); usage(); process.exit(2); }
     }
-    else if (a === 'dbtools' || a === 'softarch') {
+    else if (a === 'dbtools' || a === 'softarch' || a === 'softeng') {
       if (!opts.suites.includes(a)) opts.suites.push(a);
     }
     else if (a === '--global') opts.scope = 'global';
@@ -171,7 +189,7 @@ function parseArgs(argv) {
     else { console.error('Argumento desconocido: ' + a); usage(); process.exit(2); }
   }
   if (opts.targets.length === 0) opts.targets = KNOWN_TARGETS.slice();
-  if (opts.suites.length === 0) opts.suites = ['dbtools', 'softarch'];
+  if (opts.suites.length === 0) opts.suites = ['dbtools', 'softarch', 'softeng'];
   return opts;
 }
 
@@ -370,7 +388,7 @@ const TOOLS = {
     contextFile(suite) {
       if (opts.scope === 'project') return path.join(opts.projectDir, 'AGENTS.md');
       const suiteName = suite && suite.name ? suite.name : 'dbtools';
-      const ruleName = (suite && suite.ruleFileName) ? suite.ruleFileName : (suiteName === 'softarch' ? 'software-archeologist.md' : 'dbtools.md');
+      const ruleName = (suite && suite.ruleFileName) ? suite.ruleFileName : (suiteName === 'softarch' ? 'software-archeologist.md' : (suiteName === 'softeng' ? 'softeng.md' : 'dbtools.md'));
       return path.join(HOME, '.gemini', 'config', 'rules', ruleName);
     },
     reloadNote: 'Usa /agents o inicia una conversación para ver los agentes y skills.',
@@ -922,14 +940,17 @@ async function promptInteractive(parsedOpts) {
   console.log('1. Selecciona qué agente o suite deseas instalar:');
   console.log('   [1] dbtools (SQL Server Suite — 1 orquestador + 5 especialistas + 6 skills)');
   console.log('   [2] softarch (Software Archaeologist — Arqueología y análisis no destructivo)');
-  console.log('   [3] Todas las suites (dbtools + softarch)');
+  console.log('   [3] softeng (Software Engineering & Architecture — VSA, agnóstico y seguridad)');
+  console.log('   [4] Todas las suites (dbtools + softarch + softeng)');
   
-  const suiteChoice = (await askQuestion(rl, '\nElige una opción [1-3] (por defecto: 3): ')).trim();
-  let selectedSuites = ['dbtools', 'softarch'];
+  const suiteChoice = (await askQuestion(rl, '\nElige una opción [1-4] (por defecto: 4): ')).trim();
+  let selectedSuites = ['dbtools', 'softarch', 'softeng'];
   if (suiteChoice === '1') {
     selectedSuites = ['dbtools'];
   } else if (suiteChoice === '2') {
     selectedSuites = ['softarch'];
+  } else if (suiteChoice === '3') {
+    selectedSuites = ['softeng'];
   }
 
   console.log('\n2. Selecciona el Harness / Entorno de IA destino:');

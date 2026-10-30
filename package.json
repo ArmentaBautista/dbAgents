@@ -1,13 +1,16 @@
 {
   "name": "dbagents",
   "version": "1.0.0",
-  "description": "SQL Server orchestrator agent and specialized skills for AI coding tools (OpenCode, Kilo Code, Claude Code, Gemini CLI, Codex CLI, Antigravity)",
+  "description": "Multi-suite AI agents and skills for coding tools (dbtools for SQL Server, softarch for software archaeology, softeng for software architecture & engineering)",
   "main": "dbtools/install.js",
   "bin": {
+    "dbagents": "./dbtools/install.js",
     "dbtools": "./dbtools/install.js"
   },
   "files": [
-    "dbtools"
+    "dbtools",
+    "softarch",
+    "softeng"
   ],
   "engines": {
     "node": ">=16.0.0"
@@ -16,6 +19,11 @@
     "sql-server",
     "dba",
     "orchestrator",
+    "software-architecture",
+    "software-engineering",
+    "vertical-slice",
+    "owasp",
+    "nist",
     "ai-agents",
     "agent-skills",
     "claude-code",

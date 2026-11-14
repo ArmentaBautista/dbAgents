@@ -2,16 +2,18 @@
 
 Suite portable de agentes y skills para herramientas de IA como **OpenCode, Kilo Code, Claude Code, Gemini CLI, Codex CLI, Google Antigravity y GitHub Copilot**.
 
-Actualmente incluye tres suites independientes:
+Actualmente incluye cuatro suites independientes:
 1. **dbtools (SQL Server)**: 1 agente orquestador + 5 subagentes especialistas (developer, administrator, tuning, audit/security, data-analyst) bajo estricta política de **solo lectura**.
 2. **softarch (Software Archaeologist)**: Agente arqueólogo de software para inspección de código legado, minería de intenciones y análisis de riesgos bajo operación estrictamente **no destructiva**.
 3. **softeng (Software Engineering & Architecture)**: Agente senior de ingeniería y arquitectura de software para diseño agnóstico al stack (matriz de 3 opciones), **Vertical Slice Architecture**, prevención consultiva de sobreingeniería, nomenclatura UpperCamelCase y snake_case, y gobierno integral de seguridad (**OWASP API Top 10, ASVS, NIST SP 800-53 y 800-115** con SAST/DAST/SCA).
+4. **erprise-ds (ERPRISE Design System)**: Agente senior de UI/UX y Frontend (`erprise-ds`) + skill (`erprise-design-system`) para diseño institucional en **Modo Claro** (`Light Mode`), aplicaciones web SaaS (.NET Blazor + MudBlazor, Svelte MiniApps), páginas web comerciales estáticas (HTML5/CSS3/JS Vanilla), integración en raíz `/` sin SignalR, modo Kiosco, reportes Excel ejecutivos (ClosedXML) y gestión de activos de marca.
 
 | Suite | Componentes | Rol | Enfoque |
 |---|---|---|---|
 | `dbtools` | 1 orquestador + 5 subagentes + 6 skills | Administración, tuning, auditoría y desarrollo SQL Server | Solo lectura (`SELECT`, `sys.*`, `sys.dm_*`) |
 | `softarch` | 1 agente principal + 1 skill | Arqueología de software, código legado e intención | Análisis no destructivo y basado en evidencia |
 | `softeng` | 1 agente principal + 4 skills | Ingeniería de software, arquitectura agnóstica y seguridad | Vertical Slice, matriz de stacks, no sobreingeniería y NIST/OWASP |
+| `erprise-ds` | 1 agente principal + 1 skill + assets | UI/UX corporativo, Frontend SaaS Blazor, WebPage y Kiosco | Tokens cromáticos, plantillas listas, cero colisión y 6 reglas inquebrantables |
 
 ---
 
@@ -59,6 +61,9 @@ Requiere Node.js 16+:
 # Instalación global de todas las suites en todas las tools soportadas
 npx github:ArmentaBautista/dbAgents
 
+# Instalar únicamente la suite erprise-ds (Sistema de Diseño ERPRISE)
+npx github:ArmentaBautista/dbAgents --suite erprise-ds
+
 # Instalar únicamente la suite softeng (Ingeniería y Arquitectura de Software)
 npx github:ArmentaBautista/dbAgents --suite softeng
 
@@ -88,6 +93,7 @@ npx github:ArmentaBautista/dbAgents --uninstall
 irm https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/install.ps1 | iex
 
 # O pasando opciones específicas
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/install.ps1))) --suite erprise-ds
 & ([scriptblock]::Create((irm https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/install.ps1))) --suite softeng
 & ([scriptblock]::Create((irm https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/install.ps1))) --suite softarch
 & ([scriptblock]::Create((irm https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/install.ps1))) opencode kilocode
@@ -99,6 +105,7 @@ irm https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/install.ps1 
 curl -fsSL https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/install.sh | bash
 
 # O pasando opciones específicas
+curl -fsSL https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/install.sh | bash -s -- --suite erprise-ds
 curl -fsSL https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/install.sh | bash -s -- --suite softeng
 curl -fsSL https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/install.sh | bash -s -- --suite softarch
 curl -fsSL https://raw.githubusercontent.com/ArmentaBautista/dbAgents/main/install.sh | bash -s -- opencode kilocode
@@ -118,6 +125,7 @@ node install.js -i                     # forzar modo interactivo
 
 # Modo Directo / CLI:
 node install.js all                    # todas las suites en todas las tools
+node install.js --suite erprise-ds     # solo suite erprise-ds (Sistema de Diseño ERPRISE)
 node install.js --suite softeng        # solo suite softeng (Arquitectura e Ingeniería)
 node install.js --suite softarch       # solo suite softarch
 node install.js --suite dbtools        # solo suite dbtools SQL Server
@@ -129,6 +137,7 @@ node install.js --no-overwrite         # no sobrescribir archivos existentes
 
 # Desinstalación
 node install.js --uninstall            # desinstalar todo a nivel global
+node install.js --suite erprise-ds -u  # desinstalar solo erprise-ds
 node install.js --suite softeng -u     # desinstalar solo softeng
 node install.js --suite softarch -u    # desinstalar solo softarch
 node install.js -u --dry-run           # previsualizar qué se desinstalaría
@@ -139,7 +148,7 @@ node install.js --project . -u         # desinstalar del proyecto actual
 | Flag | Efecto |
 |---|---|
 | `--interactive`, `-i` | lanza el menú interactivo guiado (por defecto si no se indican argumentos) |
-| `--suite <name>` | suite a instalar/desinstalar: `dbtools`, `softarch`, `softeng` o `all` (por defecto: `all`) |
+| `--suite <name>` | suite a instalar/desinstalar: `dbtools`, `softarch`, `softeng`, `erprise-ds` o `all` (por defecto: `all`) |
 | `--global` (por defecto) | instala/desinstala en la carpeta de usuario de cada tool |
 | `--project <dir>` | instala/desinstala dentro de un proyecto |
 | `--uninstall`, `-u` | desinstala las skills, agentes y plugins correspondientes sin tocar configuraciones ajenas |
@@ -169,6 +178,25 @@ dbAgents/
 │   │   └── softarch.md           # Agente arqueólogo de software
 │   └── skills/
 │       └── softarch/SKILL.md
+├── erprise-ds/                   # Suite Sistema de Diseño ERPRISE (UI/UX SaaS, WebPage, Kiosco)
+│   ├── plugin.json               # Manifiesto oficial para Google Antigravity
+│   ├── install.js                # Instalador autónomo portable (Node.js sin dependencias)
+│   ├── README.md                 # Documentación de la suite
+│   ├── assets/                   # Iconos e imagen de la suite
+│   │   └── logo.png
+│   ├── agents/
+│   │   └── erprise-ds.md         # Agente principal erprise-ds (UI/UX & Frontend Senior)
+│   └── skills/
+│       └── erprise-design-system/
+│           ├── SKILL.md          # Punto de entrada de la skill (tokens, reglas y enrutamiento)
+│           ├── references/       # Guías técnicas especializadas (01 a 04)
+│           │   ├── 01-blazor-mudblazor-saas.md
+│           │   ├── 02-webpage-comercial.md
+│           │   ├── 03-integracion-host-landing.md
+│           │   └── 04-kiosco-miniapp-excel-logos.md
+│           └── resources/        # Plantillas y activos embebidos
+│               ├── logos/        # Logotipos base corporativos ERPRISE
+│               └── templates/    # Plantillas listas Blazor (C#/Razor/CSS) y WebPage (HTML/CSS/JS)
 └── dbtools/                      # Suite de SQL Server
     ├── install.js                # motor instalador (Node.js, sin dependencias)
     ├── orchestrator-prompt.md    # persona orquestadora

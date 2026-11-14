@@ -37,7 +37,7 @@ const ROOT_DIR = path.resolve(BUNDLE_DIR, '..');
 const HOME = os.homedir();
 
 const KNOWN_TARGETS = ['antigravity', 'opencode', 'kilocode', 'copilot', 'claude', 'gemini', 'codex'];
-const KNOWN_SUITES = ['dbtools', 'softarch', 'softeng', 'all'];
+const KNOWN_SUITES = ['dbtools', 'softarch', 'softeng', 'erprise-ds', 'erprise-design-system', 'all'];
 
 const SUITES = {
   dbtools: {
@@ -95,6 +95,18 @@ const SUITES = {
     ],
     knownAgents: ['softeng'],
   },
+  'erprise-ds': {
+    name: 'erprise-ds',
+    label: 'erprise-ds (ERPRISE Design System)',
+    skillsDir: path.join(ROOT_DIR, 'erprise-ds', 'skills'),
+    agentsDir: path.join(ROOT_DIR, 'erprise-ds', 'agents'),
+    personaFile: path.join(ROOT_DIR, 'erprise-ds', 'agents', 'erprise-ds.md'),
+    ruleFileName: 'erprise-design-system.md',
+    pluginName: 'erprise-design-system',
+    pluginDesc: 'Sistema de diseño corporativo ERPRISE para aplicaciones web SaaS (.NET Blazor + MudBlazor, Svelte MiniApps y CSS agnóstico), Sitios Web Comerciales estáticos, modo Kiosco y reportes Excel',
+    knownSkills: ['erprise-design-system'],
+    knownAgents: ['erprise-ds'],
+  },
 };
 
 function getSuiteSkillNames(suiteKey) {
@@ -138,7 +150,7 @@ targets:  opencode | kilocode | claude | gemini | codex | antigravity | copilot 
 
 opciones:
   --interactive, -i   modo interactivo guiado paso a paso (por defecto si no hay argumentos)
-  --suite <name>      suite a instalar: dbtools | softarch | softeng | all (por defecto: all)
+  --suite <name>      suite a instalar: dbtools | softarch | softeng | erprise-ds | all (por defecto: all)
   --global            instalar/desinstalar a nivel de usuario (por defecto)
   --project <dir>     instalar/desinstalar dentro de un proyecto
   --uninstall, -u     desinstalar skills, agentes y configuración
@@ -152,10 +164,12 @@ Ejemplos:
   node install.js all                   # instalar todas las suites en todas las tools
   node install.js copilot               # instalar en GitHub Copilot
   node install.js antigravity           # instalar en Google Antigravity
+  node install.js --suite erprise-ds    # instalar solo el sistema de diseño ERPRISE
   node install.js --suite softeng       # instalar solo la suite softeng
   node install.js --suite softarch      # instalar solo el agente softarch
   node install.js --suite dbtools       # instalar solo el equipo dbtools SQL Server
   node install.js claude -u             # desinstalar todo de Claude
+  node install.js --suite erprise-ds -u # desinstalar solo erprise-ds
   node install.js --suite softeng -u    # desinstalar solo softeng
   node install.js --project .           # instalar en proyecto actual
 `);
@@ -174,12 +188,18 @@ function parseArgs(argv) {
     else if (KNOWN_TARGETS.includes(a)) { if (!opts.targets.includes(a)) opts.targets.push(a); }
     else if (a === '--suite') {
       const suiteVal = argv[++i];
-      if (suiteVal === 'all') opts.suites = ['dbtools', 'softarch', 'softeng'];
+      if (suiteVal === 'all') opts.suites = ['dbtools', 'softarch', 'softeng', 'erprise-ds'];
+      else if (suiteVal === 'erprise-design-system' || suiteVal === 'erprise-ds') {
+        if (!opts.suites.includes('erprise-ds')) opts.suites.push('erprise-ds');
+      }
       else if (KNOWN_SUITES.includes(suiteVal)) opts.suites.push(suiteVal);
       else { console.error('Suite desconocida: ' + suiteVal); usage(); process.exit(2); }
     }
-    else if (a === 'dbtools' || a === 'softarch' || a === 'softeng') {
+    else if (a === 'dbtools' || a === 'softarch' || a === 'softeng' || a === 'erprise-ds') {
       if (!opts.suites.includes(a)) opts.suites.push(a);
+    }
+    else if (a === 'erprise-design-system') {
+      if (!opts.suites.includes('erprise-ds')) opts.suites.push('erprise-ds');
     }
     else if (a === '--global') opts.scope = 'global';
     else if (a === '--project') { opts.scope = 'project'; opts.projectDir = path.resolve(argv[++i] || '.'); }
@@ -189,7 +209,7 @@ function parseArgs(argv) {
     else { console.error('Argumento desconocido: ' + a); usage(); process.exit(2); }
   }
   if (opts.targets.length === 0) opts.targets = KNOWN_TARGETS.slice();
-  if (opts.suites.length === 0) opts.suites = ['dbtools', 'softarch', 'softeng'];
+  if (opts.suites.length === 0) opts.suites = ['dbtools', 'softarch', 'softeng', 'erprise-ds'];
   return opts;
 }
 
@@ -371,10 +391,10 @@ const TOOLS = {
     // También instala las rules en ~/.gemini/config/rules/{ruleFileName}.
     isPlugin: true,
     skillsDir(suite) {
-      const suiteName = suite && suite.name ? suite.name : 'dbtools';
+      const folderName = suite && suite.pluginName ? suite.pluginName : (suite && suite.name ? suite.name : 'dbtools');
       return opts.scope === 'project'
         ? path.join(opts.projectDir, '.agents', 'skills')
-        : path.join(HOME, '.gemini', 'config', 'plugins', suiteName, 'skills');
+        : path.join(HOME, '.gemini', 'config', 'plugins', folderName, 'skills');
     },
     agentsDir() {
       return opts.scope === 'project'
@@ -453,9 +473,13 @@ function claudeAgentContent(name, content) {
   const description = frontmatterField(frontmatter, 'description');
   // En Claude Code / Desktop, el orquestador delega con 'Agent' y usa 'Skill'.
   // Los subagentes especialistas necesitan 'Skill' para sus runbooks.
-  const toolsList = name === 'dbtools'
-    ? ['Read', 'Grep', 'Glob', 'Bash', 'Agent', 'Skill', 'WebFetch', 'WebSearch']
-    : ['Read', 'Grep', 'Glob', 'Bash', 'Skill', 'WebFetch', 'WebSearch'];
+  // Agentes activos (softeng, erprise-ds) requieren además capacidades de escritura (Write, Edit).
+  const isReadOnly = (name === 'dbtools' || name.startsWith('sql-server-') || name === 'softarch');
+  const toolsList = isReadOnly
+    ? (name === 'dbtools'
+        ? ['Read', 'Grep', 'Glob', 'Bash', 'Agent', 'Skill', 'WebFetch', 'WebSearch']
+        : ['Read', 'Grep', 'Glob', 'Bash', 'Skill', 'WebFetch', 'WebSearch'])
+    : ['Read', 'Write', 'Edit', 'Grep', 'Glob', 'Bash', 'Agent', 'Skill', 'WebFetch', 'WebSearch'];
   const toolsYaml = toolsList.map((t) => `  - ${t}`).join('\n');
   const safeDesc = JSON.stringify(description);
   return [
@@ -480,14 +504,16 @@ function tomlBasic(value) {
     .replace(/\n/g, '\\n') + '"';
 }
 
-// Codex: subagente TOML (name/description/sandbox read-only/developer_instructions).
+// Codex: subagente TOML (name/description/sandbox/developer_instructions).
 function codexAgentContent(name, content) {
   const { frontmatter, body } = splitFrontmatter(content);
   const description = frontmatterField(frontmatter, 'description');
+  const isReadOnly = (name === 'dbtools' || name.startsWith('sql-server-') || name === 'softarch');
+  const sandboxMode = isReadOnly ? 'read-only' : 'workspace-write';
   return [
     `name = ${tomlBasic(name)}`,
     `description = ${tomlBasic(description)}`,
-    'sandbox_mode = "read-only"',
+    `sandbox_mode = "${sandboxMode}"`,
     `developer_instructions = ${tomlBasic(body)}`,
     '',
   ].join('\n');
@@ -497,18 +523,32 @@ function installAntigravityPlugin(suite) {
   if (opts.scope !== 'global' || !suite.pluginName) return;
   const pluginDir = path.join(HOME, '.gemini', 'config', 'plugins', suite.pluginName);
   const manifestFile = path.join(pluginDir, 'plugin.json');
-  const manifest = JSON.stringify({
-    name: suite.pluginName,
-    version: '1.0.0',
-    description: suite.pluginDesc
-  }, null, 2) + '\n';
+
+  const customPluginJson = path.join(ROOT_DIR, suite.name, 'plugin.json');
+  const customAssets = path.join(ROOT_DIR, suite.name, 'assets');
+  const customReadme = path.join(ROOT_DIR, suite.name, 'README.md');
 
   if (opts.overwrite || !fs.existsSync(manifestFile)) {
     if (opts.dryRun) {
       console.log(`  plugin manifest -> ${manifestFile}`);
     } else {
       fs.mkdirSync(pluginDir, { recursive: true });
-      fs.writeFileSync(manifestFile, manifest);
+      if (fs.existsSync(customPluginJson)) {
+        fs.copyFileSync(customPluginJson, manifestFile);
+        if (fs.existsSync(customReadme)) {
+          fs.copyFileSync(customReadme, path.join(pluginDir, 'README.md'));
+        }
+        if (fs.existsSync(customAssets)) {
+          copyDirRecursive(customAssets, path.join(pluginDir, 'assets'), opts.overwrite);
+        }
+      } else {
+        const manifest = JSON.stringify({
+          name: suite.pluginName,
+          version: '1.0.0',
+          description: suite.pluginDesc
+        }, null, 2) + '\n';
+        fs.writeFileSync(manifestFile, manifest);
+      }
       console.log(`  plugin manifest -> ${manifestFile}`);
     }
   }
@@ -603,11 +643,23 @@ function installAgents(tool, toolId, suite) {
         ].join('\n');
         fs.writeFileSync(agentFile, agentContent);
 
+        // Si es erprise-ds, crear también el alias erprise-design-system
+        if (name === 'erprise-ds') {
+          const aliasFolder = path.join(dst, 'erprise-design-system');
+          fs.mkdirSync(aliasFolder, { recursive: true });
+          fs.writeFileSync(path.join(aliasFolder, 'agent.md'), agentContent);
+        }
+
         // Si es global y existe ~/.gemini/antigravity-cli, instalar también allí
         if (opts.scope === 'global' && fs.existsSync(path.join(HOME, '.gemini', 'antigravity-cli'))) {
           const cliAgentFolder = path.join(HOME, '.gemini', 'antigravity-cli', 'agents', name);
           fs.mkdirSync(cliAgentFolder, { recursive: true });
           fs.writeFileSync(path.join(cliAgentFolder, 'agent.md'), agentContent);
+          if (name === 'erprise-ds') {
+            const cliAliasFolder = path.join(HOME, '.gemini', 'antigravity-cli', 'agents', 'erprise-design-system');
+            fs.mkdirSync(cliAliasFolder, { recursive: true });
+            fs.writeFileSync(path.join(cliAliasFolder, 'agent.md'), agentContent);
+          }
         }
       }
       count++;
@@ -625,6 +677,9 @@ function installAgents(tool, toolId, suite) {
         if (name === 'dbtools') {
           const aliasToml = path.join(dst, 'sql-server-dbtools.toml');
           fs.writeFileSync(aliasToml, codexAgentContent('sql-server-dbtools', fs.readFileSync(src, 'utf8')));
+        } else if (name === 'erprise-ds') {
+          const aliasToml = path.join(dst, 'erprise-design-system.toml');
+          fs.writeFileSync(aliasToml, codexAgentContent('erprise-design-system', fs.readFileSync(src, 'utf8')));
         }
       }
       count++;
@@ -639,6 +694,9 @@ function installAgents(tool, toolId, suite) {
         fs.mkdirSync(dst, { recursive: true });
         const agentContent = claudeAgentContent(name, fs.readFileSync(src, 'utf8'));
         fs.writeFileSync(out, agentContent);
+        if (name === 'erprise-ds') {
+          fs.writeFileSync(path.join(dst, 'erprise-design-system.md'), agentContent);
+        }
 
         // Copiar también a Claude Desktop si existe
         if (opts.scope === 'global') {
@@ -646,11 +704,17 @@ function installAgents(tool, toolId, suite) {
             const dAgentDir = path.join(d, 'agents');
             fs.mkdirSync(dAgentDir, { recursive: true });
             fs.writeFileSync(path.join(dAgentDir, f), agentContent);
+            if (name === 'erprise-ds') {
+              fs.writeFileSync(path.join(dAgentDir, 'erprise-design-system.md'), agentContent);
+            }
           }
         }
       }
     } else {
       copyFile(src, out, opts.overwrite);
+      if (name === 'erprise-ds') {
+        copyFile(src, path.join(dst, 'erprise-design-system.md'), opts.overwrite);
+      }
     }
     count++;
   }
@@ -800,19 +864,23 @@ function uninstallAgents(tool, toolId, suite) {
     for (const dir of agentDirs) {
       if (!fs.existsSync(dir)) continue;
       for (const name of agentNames) {
-        const agentFolder = path.join(dir, name);
-        if (fs.existsSync(agentFolder)) {
-          if (opts.dryRun) {
-            console.log(`  agents (${suite.name}) -> eliminar ${agentFolder}`);
-          } else {
-            try {
-              fs.rmSync(agentFolder, { recursive: true, force: true });
-              console.log(`  agents (${suite.name}) -> eliminado ${agentFolder}`);
-            } catch (e) {
-              console.log(`  [error] no se pudo eliminar ${agentFolder}: ${e.message}`);
+        const folders = [name];
+        if (name === 'erprise-ds') folders.push('erprise-design-system');
+        for (const fname of folders) {
+          const agentFolder = path.join(dir, fname);
+          if (fs.existsSync(agentFolder)) {
+            if (opts.dryRun) {
+              console.log(`  agents (${suite.name}) -> eliminar ${agentFolder}`);
+            } else {
+              try {
+                fs.rmSync(agentFolder, { recursive: true, force: true });
+                console.log(`  agents (${suite.name}) -> eliminado ${agentFolder}`);
+              } catch (e) {
+                console.log(`  [error] no se pudo eliminar ${agentFolder}: ${e.message}`);
+              }
             }
+            count++;
           }
-          count++;
         }
       }
     }
@@ -820,6 +888,7 @@ function uninstallAgents(tool, toolId, suite) {
     if (fs.existsSync(dst)) {
       const files = agentNames.map((n) => n + '.toml');
       if (suite.name === 'dbtools') files.push('sql-server-dbtools.toml');
+      if (suite.name === 'erprise-ds') files.push('erprise-design-system.toml');
 
       for (const f of files) {
         const target = path.join(dst, f);
@@ -851,19 +920,23 @@ function uninstallAgents(tool, toolId, suite) {
 
     for (const dir of agentDirs) {
       for (const name of agentNames) {
-        const target = path.join(dir, name + '.md');
-        if (fs.existsSync(target)) {
-          if (opts.dryRun) {
-            console.log(`  agents (${suite.name}) -> eliminar ${target}`);
-          } else {
-            try {
-              fs.rmSync(target, { force: true });
-              console.log(`  agents (${suite.name}) -> eliminado ${target}`);
-            } catch (e) {
-              console.log(`  [error] no se pudo eliminar ${target}: ${e.message}`);
+        const files = [name + '.md'];
+        if (name === 'erprise-ds') files.push('erprise-design-system.md');
+        for (const fname of files) {
+          const target = path.join(dir, fname);
+          if (fs.existsSync(target)) {
+            if (opts.dryRun) {
+              console.log(`  agents (${suite.name}) -> eliminar ${target}`);
+            } else {
+              try {
+                fs.rmSync(target, { force: true });
+                console.log(`  agents (${suite.name}) -> eliminado ${target}`);
+              } catch (e) {
+                console.log(`  [error] no se pudo eliminar ${target}: ${e.message}`);
+              }
             }
+            count++;
           }
-          count++;
         }
       }
     }
@@ -941,16 +1014,19 @@ async function promptInteractive(parsedOpts) {
   console.log('   [1] dbtools (SQL Server Suite — 1 orquestador + 5 especialistas + 6 skills)');
   console.log('   [2] softarch (Software Archaeologist — Arqueología y análisis no destructivo)');
   console.log('   [3] softeng (Software Engineering & Architecture — VSA, agnóstico y seguridad)');
-  console.log('   [4] Todas las suites (dbtools + softarch + softeng)');
+  console.log('   [4] erprise-ds (ERPRISE Design System — UI/UX SaaS Blazor, WebPage, Kiosco y Excel)');
+  console.log('   [5] Todas las suites (dbtools + softarch + softeng + erprise-ds)');
   
-  const suiteChoice = (await askQuestion(rl, '\nElige una opción [1-4] (por defecto: 4): ')).trim();
-  let selectedSuites = ['dbtools', 'softarch', 'softeng'];
+  const suiteChoice = (await askQuestion(rl, '\nElige una opción [1-5] (por defecto: 5): ')).trim();
+  let selectedSuites = ['dbtools', 'softarch', 'softeng', 'erprise-ds'];
   if (suiteChoice === '1') {
     selectedSuites = ['dbtools'];
   } else if (suiteChoice === '2') {
     selectedSuites = ['softarch'];
   } else if (suiteChoice === '3') {
     selectedSuites = ['softeng'];
+  } else if (suiteChoice === '4') {
+    selectedSuites = ['erprise-ds'];
   }
 
   console.log('\n2. Selecciona el Harness / Entorno de IA destino:');

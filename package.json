@@ -1,7 +1,7 @@
 {
   "name": "dbagents",
   "version": "1.0.0",
-  "description": "Multi-suite AI agents and skills for coding tools (dbtools for SQL Server, softarch for software archaeology, softeng for software architecture & engineering)",
+  "description": "Multi-suite AI agents and skills for coding tools (dbtools for SQL Server, softarch for software archaeology, softeng for software architecture & engineering, erprise-ds for ERPRISE Design System UI/UX)",
   "main": "dbtools/install.js",
   "bin": {
     "dbagents": "./dbtools/install.js",
@@ -10,7 +10,8 @@
   "files": [
     "dbtools",
     "softarch",
-    "softeng"
+    "softeng",
+    "erprise-ds"
   ],
   "engines": {
     "node": ">=16.0.0"
@@ -24,13 +25,19 @@
     "vertical-slice",
     "owasp",
     "nist",
+    "design-system",
+    "ui-ux",
+    "blazor",
+    "mudblazor",
+    "erprise",
     "ai-agents",
     "agent-skills",
     "claude-code",
     "opencode",
     "kilo-code",
     "codex-cli",
-    "antigravity"
+    "antigravity",
+    "github-copilot"
   ],
   "scripts": {
     "install": "node dbtools/install.js",

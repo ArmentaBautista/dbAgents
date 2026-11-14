@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Erprise Attendance — Control de Asistencia Inteligente para tu Empresa</title>
+  <meta name="description" content="Plataforma empresarial de control de asistencia con reconocimiento facial, biometría dactilar, turnos rotativos, vacaciones LFT, Telegram MiniApp y reportes avanzados. Solución SaaS para México.">
+  <meta name="keywords" content="control de asistencia, reloj checador, reconocimiento facial, biometría, vacaciones LFT, turnos rotativos, recursos humanos, México">
+  <meta name="author" content="ERPRISE">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Erprise Attendance — Control de Asistencia Inteligente">
+  <meta property="og:description" content="Plataforma empresarial con reconocimiento facial, biometría, turnos rotativos y vacaciones LFT. Moderniza tu control de asistencia.">
+  <meta property="og:image" content="images/screenshots/tablero-ejecutivo.png">
+  <meta property="og:url" content="https://attendance.erprise.com">
+  <meta property="og:site_name" content="Erprise Attendance">
+  <meta property="og:locale" content="es_MX">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Erprise Attendance — Control de Asistencia Inteligente">
+  <meta name="twitter:description" content="Plataforma empresarial con reconocimiento facial, biometría y vacaciones LFT.">
+  <meta name="twitter:image" content="images/screenshots/tablero-ejecutivo.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="images/logos/favicon.png?v=3">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Redirección automática si el usuario ya cuenta con sesión activa -->
+  <script>
+    if (sessionStorage.getItem('UserSession')) {
+      window.location.replace('/tablero');
+    }
+  </script>
+</head>
+<body>
+
+  <!-- ==================== HEADER ==================== -->
+  <header class="header" id="header">
+    <div class="container header__inner">
+      <a href="#inicio" class="header__logo" aria-label="Ir al inicio">
+        <img src="images/logos/erprise-attendance-icon.png" alt="Erprise Attendance" width="34" height="34">
+        <div class="header__logo-text">
+          <span>Erprise</span>
+          <span>Attendance</span>
+        </div>
+      </a>
+
+      <nav class="header__nav" aria-label="Navegación principal">
+        <a href="#funciones">Funciones</a>
+        <a href="#precios">Precios</a>
+        <a href="#faq">FAQ</a>
+        <a href="#contacto">Contacto</a>
+      </nav>
+
+      <div class="header__cta">
+        <a href="/login" class="btn btn--secondary btn--sm">Iniciar Sesión</a>
+        <a href="#contacto" class="btn btn--primary btn--sm">Solicitar Demo</a>
+      </div>
+
+      <button class="header__hamburger" aria-label="Abrir menú de navegación" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Overlay -->
+  <div class="mobile-nav" aria-label="Navegación móvil">
+    <a href="#inicio">Inicio</a>
+    <a href="#funciones">Funciones</a>
+    <a href="#precios">Precios</a>
+    <a href="#faq">FAQ</a>
+    <a href="#contacto">Contacto</a>
+    <a href="/login" class="btn btn--secondary">Iniciar Sesión</a>
+    <a href="#contacto" class="btn btn--primary">Solicitar Demo</a>
+  </div>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main>
+
+    <!-- ========== HERO ========== -->
+    <section class="hero" id="inicio">
+      <div class="container">
+        <div class="hero__content hero__intro fade-in">
+          <div class="hero__brand">
+            <img src="images/logos/erprise-attendance-logo.png" alt="Erprise Attendance — Control de Asistencia Inteligente" width="640" height="268">
+          </div>
+          <div class="hero__copy">
+            <div class="hero__badge">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              Plataforma Empresarial de Asistencia
+            </div>
+            <h1 class="hero__title">
+              Control de asistencia<br>
+              <span>Intelix</span>ente para tu empresa
+            </h1>
+            <p class="hero__subtitle">
+              Biometría facial con IA, turnos rotativos, vacaciones LFT y marcaje desde Telegram. 
+              Todo en una plataforma moderna, segura y lista para la nube.
+            </p>
+            <div class="btn-group hero__actions">
+              <a href="#contacto" class="btn btn--primary btn--lg">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Solicitar Demo
+              </a>
+              <a href="#funciones" class="btn btn--secondary btn--lg">Ver Funciones</a>
+            </div>
+          </div>
+        </div>
+        <div class="hero__image fade-in">
+          <img src="images/screenshots/tablero-ejecutivo.png" alt="Tablero ejecutivo de Erprise Attendance mostrando indicadores de asistencia, retardos y ausencias" width="900" height="500" loading="eager">
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== HIGHLIGHTS ========== -->
+    <section class="section section--alt highlights" id="funciones">
+      <div class="container">
+        <div class="section__header fade-in">
+          <span class="section__tag">Funcionalidades</span>
+          <h2 class="section__title">Todo lo que necesitas en una sola plataforma</h2>
+          <p class="section__subtitle">Desde biometría avanzada hasta gestión de vacaciones, Erprise Attendance cubre cada aspecto del control de asistencia empresarial.</p>
+        </div>
+        <div class="grid grid--3 grid--highlights">
+          <!-- Card 1: Biometría Facial -->
+          <div class="card fade-in">
+            <div class="card__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><circle cx="12" cy="10" r="3"></circle><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"></path></svg>
+            </div>
+            <h3 class="card__title">Reconocimiento Facial</h3>
+            <p class="card__text">Verificación con IA y anti-spoofing pasivo integrado. Sin hardware propietario — funciona con cualquier cámara web estándar.</p>
+          </div>
+          <!-- Card 2: Turnos Flexibles -->
+          <div class="card fade-in">
+            <div class="card__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <h3 class="card__title">Turnos Flexibles y Rotativos</h3>
+            <p class="card__text">Soporte completo para turnos fijos, flexibles y rotativos N×M con cuadrillas. Ideal para industria, hospitales y guardias.</p>
+          </div>
+          <!-- Card 3: Vacaciones LFT -->
+          <div class="card fade-in">
+            <div class="card__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            </div>
+            <h3 class="card__title">Vacaciones LFT</h3>
+            <p class="card__text">Cálculo automático de vacaciones dignas según el Artículo 76 reformado. Solicitudes, aprobaciones y saldo en tiempo real.</p>
+          </div>
+          <!-- Card 4: Telegram MiniApp -->
+          <div class="card fade-in">
+            <div class="card__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+            </div>
+            <h3 class="card__title">Telegram MiniApp</h3>
+            <p class="card__text">Marcaje desde el celular con selfie, GPS y sin instalar apps adicionales. Tu equipo en campo checa desde Telegram.</p>
+          </div>
+          <!-- Card 5: Reportes Excel -->
+          <div class="card fade-in">
+            <div class="card__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            </div>
+            <h3 class="card__title">Reportes y Exportación</h3>
+            <p class="card__text">Reportes de incidencias, ausencias y retardos con exportación a Excel profesional. Formato corporativo con código de colores.</p>
+          </div>
+          <!-- Card 6: Multi-Empresa -->
+          <div class="card fade-in">
+            <div class="card__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            </div>
+            <h3 class="card__title">Multi-Empresa</h3>
+            <p class="card__text">Arquitectura multi-tenant desde el diseño. Administra múltiples empresas, sucursales y centros de trabajo desde un solo panel.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== FEATURE: Reconocimiento Facial ========== -->
+    <section class="feature" id="feature-facial">
+      <div class="container">
+        <div class="feature__grid fade-in">
+          <div class="feature__text">
+            <span class="feature__tag">Biometría Avanzada</span>
+            <h2 class="feature__title">Reconocimiento facial con inteligencia artificial</h2>
+            <p class="feature__desc">
+              Verificación de identidad en menos de 50ms con anti-spoofing pasivo integrado. 
+              Detecta intentos de suplantación con fotografías o pantallas, protegiendo la 
+              integridad de cada registro de asistencia.
+            </p>
+            <ul class="feature__list">
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Anti-spoofing pasivo: bloquea fotos y pantallas
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Funciona con cualquier cámara web estándar
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Inferencia en servidor — sin dependencia de hardware propietario
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Modos configurable: alerta o bloqueo estricto
+              </li>
+            </ul>
+          </div>
+          <div class="feature__image">
+            <img src="images/screenshots/reloj-checador.png" alt="Pantalla del reloj checador con verificación facial biométrica" width="600" height="400" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== FEATURE: Turnos y Horarios ========== -->
+    <section class="feature feature--reverse" id="feature-turnos">
+      <div class="container">
+        <div class="feature__grid fade-in">
+          <div class="feature__text">
+            <span class="feature__tag">Gestión de Turnos</span>
+            <h2 class="feature__title">Turnos fijos, flexibles y rotativos con cuadrillas</h2>
+            <p class="feature__desc">
+              Configura cualquier esquema de trabajo: desde turnos fijos tradicionales 
+              hasta guardias rotativas N×M con cuadrillas. El sistema calcula automáticamente 
+              retardos, tiempo extra y jornadas incompletas.
+            </p>
+            <ul class="feature__list">
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Turnos fijos, flexibles y rotativos N×M
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Cuadrillas con fecha ancla y rotación automática
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Cálculo de tiempo extra y guardias nocturnas
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Programación visual con calendario interactivo
+              </li>
+            </ul>
+          </div>
+          <div class="feature__image">
+            <img src="images/screenshots/turnos.png" alt="Catálogo de turnos con configuración de horarios fijos, flexibles y rotativos" width="600" height="400" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== FEATURE: Vacaciones y Permisos ========== -->
+    <section class="feature" id="feature-vacaciones">
+      <div class="container">
+        <div class="feature__grid fade-in">
+          <div class="feature__text">
+            <span class="feature__tag">Vacaciones y Permisos</span>
+            <h2 class="feature__title">Vacaciones dignas LFT y permisos laborales automatizados</h2>
+            <p class="feature__desc">
+              Cumple con la Ley Federal del Trabajo de forma automática. El sistema calcula 
+              los días de vacaciones según antigüedad (Art. 76 reformado), gestiona solicitudes 
+              con flujo de aprobación e integra incapacidades IMSS.
+            </p>
+            <ul class="feature__list">
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Cálculo automático de vacaciones LFT por antigüedad
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Flujo de solicitud → aprobación con notificaciones
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Permisos con y sin goce de sueldo, incapacidades IMSS
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Calendario de cobertura con visibilidad por puesto
+              </li>
+            </ul>
+          </div>
+          <div class="feature__image">
+            <img src="images/screenshots/solicitudes-tiempo-libre.png" alt="Pantalla de solicitudes de vacaciones y permisos con estados y aprobaciones" width="600" height="400" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== FEATURE: Telegram MiniApp ========== -->
+    <section class="feature" id="feature-telegram">
+      <div class="container">
+        <div class="feature__grid-three fade-in">
+
+          <!-- Mockup Izquierdo -->
+          <div class="feature__image feature__image--left">
+            <img src="images/screenshots/miniapp-check01.jpg" alt="Telegram MiniApp pantalla de inicio" width="360" height="640" loading="lazy">
+          </div>
+
+          <!-- Texto Central -->
+          <div class="feature__text">
+            <span class="feature__tag">Movilidad</span>
+            <h2 class="feature__title">Registro de asistencia desde Telegram — sin apps extra</h2>
+            <p class="feature__desc">
+              Tu equipo en campo registra su asistencia directamente desde Telegram con selfie 
+              verificada y geolocalización GPS. Sin descargar aplicaciones adicionales, sin costos 
+              de desarrollo móvil.
+            </p>
+            <ul class="feature__list">
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Selfie con cámara frontal y validación facial
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Geolocalización GPS para auditoría de ubicación
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Vinculación segura por OTP y Deep Link QR
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Consulta de vacaciones y calendario del equipo
+              </li>
+            </ul>
+          </div>
+
+          <!-- Mockup Derecho -->
+          <div class="feature__image feature__image--right">
+            <img src="images/screenshots/miniapp-check02.jpg" alt="Telegram MiniApp pantalla de confirmación" width="360" height="640" loading="lazy">
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== FEATURE: Reportes ========== -->
+    <section class="feature" id="feature-reportes">
+      <div class="container">
+        <div class="feature__grid fade-in">
+          <div class="feature__text">
+            <span class="feature__tag">Reportes</span>
+            <h2 class="feature__title">Reportes ejecutivos con exportación profesional a Excel</h2>
+            <p class="feature__desc">
+              Visualiza incidencias diarias, ausencias y retardos en tiempo real. Exporta reportes 
+              a Excel con formato corporativo, código de colores por estado y detalle completo 
+              de marcas de auditoría.
+            </p>
+            <ul class="feature__list">
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Tablero ejecutivo con KPIs en tiempo real
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Reporte de incidencias, ausencias y retardos
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Excel corporativo con 2 hojas y formato de colores
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Detalle de marcas con GPS, origen y observaciones
+              </li>
+            </ul>
+          </div>
+          <div class="feature__image">
+            <img src="images/screenshots/reportes-incidencias.png" alt="Reporte de incidencias diarias con chips de estado y filtros" width="600" height="400" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== PRICING ========== -->
+    <section class="section section--alt" id="precios">
+      <div class="container">
+        <div class="section__header fade-in">
+          <span class="section__tag">Precios</span>
+          <h2 class="section__title">UN SOLO PLAN PARA TU ORGANIZACIÓN.</h2>
+          <p class="section__subtitle">Olvidate de planes diferenciados que limitan el aprovechamiento de la plataforma.</p>
+          <p class="section__subtitle">Sin costos ocultos. Sin contratos a largo plazo. Incluye soporte y actualizaciones.</p>
+        </div>
+        
+        <div class="pricing__grid pricing__grid--single fade-in">
+          <div class="pricing-card pricing-card--featured">
+            <span class="pricing-card__badge">Acceso Total</span>
+            <h3 class="pricing-card__name">Plan Todo Incluido</h3>
+            <p class="pricing-card__desc">Todas las herramientas y funcionalidades para el control total de tu empresa</p>
+            <div class="pricing-card__price">Contáctanos</div>
+            <p class="pricing-card__period">Precio $3.00 dls por empleado / mes. (precio más IVA)</p>
+            <p class="pricing-card__period">Costo único de Activación $50.00 dls. (precio más IVA)</p>
+            <p class="pricing-card__upto10">Si cuentas con más de 10 colaboradores, contactanos para ofrecerte una cotización personalizada.</p>
+            <ul class="pricing-card__features">
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Reloj checador web (código + contraseña)
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Reconocimiento facial con anti-spoofing IA
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Biometría dactilar (Digital Persona)
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Telegram MiniApp con selfie y GPS
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Turnos fijos, flexibles y rotativos N×M con cuadrillas
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Vacaciones LFT automáticas
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Permisos, incapacidades IMSS y organigrama
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Centros de trabajo
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Gestión integral de empleados y departamentos
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Reportes de incidencias y exportación a Excel
+              </li>
+              <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Soporte prioritario por WhatsApp y correo electrónico
+              </li>
+            </ul>
+
+            <a href="#contacto" class="btn btn--primary">Solicitar Demo Gratuita</a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== FAQ ========== -->
+    <section class="section" id="faq">
+      <div class="container">
+        <div class="section__header fade-in">
+          <span class="section__tag">Preguntas Frecuentes</span>
+          <h2 class="section__title">¿Tienes dudas? Te respondemos</h2>
+        </div>
+        <div class="faq__list fade-in">
+          <details class="faq__item">
+            <summary>¿Necesito hardware especial para usar Erprise Attendance?</summary>
+            <div class="faq__answer">
+              No. El reloj checador funciona en cualquier navegador web moderno. Para reconocimiento facial solo necesitas una cámara web estándar — no se requiere hardware biométrico propietario. Si deseas biometría dactilar, soportamos lectores Digital Persona U.are.U con un agente local ligero.
+            </div>
+          </details>
+          <details class="faq__item">
+            <summary>¿Cómo funciona el registro desde Telegram?</summary>
+            <div class="faq__answer">
+              Tus colaboradores en campo se vinculan una sola vez mediante un código OTP o QR. Después, abren la MiniApp directamente dentro de Telegram para registrar entrada, descanso y salida — con selfie verificada por reconocimiento facial y ubicación GPS. No necesitan descargar ni instalar ninguna aplicación adicional.
+            </div>
+          </details>
+          <details class="faq__item">
+            <summary>¿Cumple con la Ley Federal del Trabajo de México?</summary>
+            <div class="faq__answer">
+              Sí. El sistema calcula automáticamente los días de vacaciones según el Artículo 76 reformado (Vacaciones Dignas), incluyendo la progresión por antigüedad y el consumo FIFO de periodos. También gestiona permisos con y sin goce de sueldo e incapacidades IMSS con integración automática en el cierre de asistencia.
+            </div>
+          </details>
+          <details class="faq__item">
+            <summary>¿Puedo administrar la estructura de mi Organización?</summary>
+            <div class="faq__answer">
+              Sí. Erprise Attendance tiene una arquitectura que le permite reproducir la estructura de departamentos, puestos las jerarquías entre ellos, turnos, políticas y configuraciones de módulos.
+            </div>
+          </details>
+          <details class="faq__item">
+            <summary>¿Qué tipo de turnos soporta el sistema?</summary>
+            <div class="faq__answer">
+              Soportamos tres tipos: <strong>Fijos</strong> (horario fijo con tolerancia de retardo), <strong>Flexibles</strong> (meta de horas sin horario fijo — ideal para oficinas con horarios escalonados) y <strong>Rotativos N×M</strong> (N días de trabajo seguidos de M días de descanso, con cuadrillas y fecha ancla — ideal para industria, hospitales, seguridad y guardias 24/7).
+            </div>
+          </details>
+          <details class="faq__item">
+            <summary>¿Cómo funciona el anti-spoofing del reconocimiento facial?</summary>
+            <div class="faq__answer">
+              El sistema utiliza un modelo de IA que analiza la textura y profundidad de la imagen en tiempo real para detectar si se está presentando un rostro real o una fotografía/pantalla. Todo el procesamiento se realiza en el servidor sin enviar datos biométricos a terceros, garantizando privacidad y cumplimiento normativo.
+            </div>
+          </details>
+          <details class="faq__item">
+            <summary>¿Puedo solicitar una demo antes de contratar?</summary>
+            <div class="faq__answer">
+              Sí. Ofrecemos una demo personalizada donde le mostramos el sistema en vivo con datos de ejemplo. Contáctenos por el formulario o por WhatsApp y agendamos una sesión sin compromiso.
+            </div>
+          </details>
+          <details class="faq__item">
+            <summary>¿Dónde se alojan mis datos?</summary>
+            <div class="faq__answer">
+              Tus datos se almacenan en servidores seguros y bases de datos cifradas en la nube.
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== CTA BANNER ========== -->
+    <section class="cta-banner" id="cta-final">
+      <div class="container fade-in">
+        <h2 class="cta-banner__title">Moderniza el control de asistencia de tu empresa</h2>
+        <p class="cta-banner__subtitle">
+          Únete a las empresas que ya confían en Erprise Attendance para gestionar 
+          su asistencia de forma inteligente y automatizada.
+        </p>
+        <div class="btn-group" style="justify-content: center;">
+          <a href="#contacto" class="btn btn--white btn--lg">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            Solicitar Demo Gratuita
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== CONTACT ========== -->
+    <section class="section" id="contacto">
+      <div class="container">
+        <div class="section__header fade-in">
+          <span class="section__tag">Contacto</span>
+          <h2 class="section__title">¿Listo para comenzar?</h2>
+          <p class="section__subtitle">Cuéntanos sobre tu empresa y te preparamos una demo personalizada sin compromiso.</p>
+        </div>
+        <div class="contact__grid fade-in">
+          <div class="contact__info">
+            <div class="contact__info-item">
+              <div class="contact__info-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              </div>
+              <div>
+                <h4 class="contact__info-title">WhatsApp</h4>
+                <p class="contact__info-text">Escríbenos directamente para una respuesta rápida.</p>
+                <a href="https://wa.me/522451022064?text=Hola%2C%20me%20interesa%20Erprise%20Attendance.%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer" class="btn btn--secondary mt-2" style="padding: 8px 20px; font-size: 0.9rem;">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.111.547 4.099 1.504 5.832L0 24l6.335-1.652A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75c-1.884 0-3.63-.518-5.13-1.416l-.368-.218-3.812.999 1.016-3.713-.24-.382A9.72 9.72 0 0 1 2.25 12c0-5.385 4.365-9.75 9.75-9.75S21.75 6.615 21.75 12s-4.365 9.75-9.75 9.75z"/></svg>
+                  Chatear por WhatsApp
+                </a>
+              </div>
+            </div>
+            <div class="contact__info-item">
+              <div class="contact__info-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              </div>
+              <div>
+                <h4 class="contact__info-title">Correo Electrónico</h4>
+                <p class="contact__info-text">contacto@intelix.com</p>
+              </div>
+            </div>
+            <div class="contact__info-item">
+              <div class="contact__info-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              </div>
+              <div>
+                <h4 class="contact__info-title">Ubicación</h4>
+                <p class="contact__info-text">México</p>
+              </div>
+            </div>
+          </div>
+          <div class="contact-form" id="contact-form-wrapper">
+            <form id="contact-form" novalidate>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="contact-name">Nombre <span class="required">*</span></label>
+                  <input type="text" id="contact-name" name="name" placeholder="Tu nombre completo" required>
+                  <p class="form-error">El nombre es obligatorio.</p>
+                </div>
+                <div class="form-group">
+                  <label for="contact-company">Empresa</label>
+                  <input type="text" id="contact-company" name="company" placeholder="Nombre de tu empresa">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="contact-email">Correo electrónico <span class="required">*</span></label>
+                  <input type="email" id="contact-email" name="email" placeholder="tu@empresa.com" required>
+                  <p class="form-error">Ingresa un correo electrónico válido.</p>
+                </div>
+                <div class="form-group">
+                  <label for="contact-phone">Teléfono <span class="text-muted" style="font-weight:400; font-size:0.82rem;">(opcional)</span></label>
+                  <input type="tel" id="contact-phone" name="phone" placeholder="+52 (000) 000-0000">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="contact-message">Mensaje <span class="required">*</span></label>
+                <textarea id="contact-message" name="message" placeholder="Cuéntanos sobre tu empresa, número de empleados y qué necesitas..." required></textarea>
+                <p class="form-error">El mensaje es obligatorio.</p>
+              </div>
+              <button type="submit" class="btn btn--primary btn--lg" style="width: 100%;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                Enviar Mensaje por WhatsApp
+              </button>
+            </form>
+            <div class="form-success" id="form-success">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              <h3>¡Solicitud generada con éxito!</h3>
+              <p>Hemos preparado tu mensaje para enviarlo directamente a nuestro equipo por WhatsApp.</p>
+              <a href="#" id="wa-fallback-btn" target="_blank" rel="noopener noreferrer" class="btn btn--primary mt-3" style="background: #25D366; border-color: #25D366; color: #FFFFFF; font-weight: 600;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px;margin-right:8px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.111.547 4.099 1.504 5.832L0 24l6.335-1.652A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75c-1.884 0-3.63-.518-5.13-1.416l-.368-.218-3.812.999 1.016-3.713-.24-.382A9.72 9.72 0 0 1 2.25 12c0-5.385 4.365-9.75 9.75-9.75S21.75 6.615 21.75 12s-4.365 9.75-9.75 9.75z"/></svg>
+                Abrir en WhatsApp
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <div class="footer__logo-pill">
+            <img src="images/logos/erprise-attendance-logo.png" alt="Erprise Attendance" width="170" height="71">
+          </div>
+          <p>Sistema Integral para la Gestión de Organizaciones y Core Financiero.</p>
+        </div>
+        <div class="footer__links">
+          <h4>Producto</h4>
+          <a href="#funciones">Funciones</a>
+          <a href="#feature-facial">Reconocimiento Facial</a>
+          <a href="#feature-telegram">Telegram MiniApp</a>
+          <a href="#precios">Precios</a>
+        </div>
+        <div class="footer__links">
+          <h4>Soporte</h4>
+          <a href="#faq">Preguntas Frecuentes</a>
+          <a href="#contacto">Contacto</a>
+          <a href="https://wa.me/522451022064?text=Hola%2C%20necesito%20soporte%20de%20Erprise%20Attendance" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>&copy; <span id="footer-year"></span> ERPRISE. Todos los derechos reservados.</p>
+        <p>
+          <a href="#" style="color: #94A3B8;">Política de Privacidad</a> &middot;
+          <a href="#" style="color: #94A3B8;">Términos de Servicio</a>
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== WHATSAPP FLOATING BUTTON ==================== -->
+  <a href="https://wa.me/522451022064?text=Hola%2C%20me%20interesa%20Erprise%20Attendance.%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer" class="whatsapp-btn" aria-label="Contactar por WhatsApp">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.111.547 4.099 1.504 5.832L0 24l6.335-1.652A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75c-1.884 0-3.63-.518-5.13-1.416l-.368-.218-3.812.999 1.016-3.713-.24-.382A9.72 9.72 0 0 1 2.25 12c0-5.385 4.365-9.75 9.75-9.75S21.75 6.615 21.75 12s-4.365 9.75-9.75 9.75z"/></svg>
+  </a>
+
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+</body>
+</html>
+

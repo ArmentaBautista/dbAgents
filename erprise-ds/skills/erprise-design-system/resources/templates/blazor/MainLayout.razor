@@ -1,0 +1,101 @@
+@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@inject NavigationManager NavigationManager
+
+<MudThemeProvider Theme="ErpriseTheme.Theme" DefaultScrollbar="true" />
+<MudPopoverProvider />
+<MudDialogProvider FullWidth="true" MaxWidth="MaxWidth.Small" CloseButton="true" />
+<MudSnackbarProvider />
+
+<AuthorizeView>
+    <Authorized>
+        <MudLayout>
+            <MudAppBar Elevation="0" Style="background-color: #FFFFFF; border-bottom: 1px solid #E2E8F0;">
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Default" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" Style="color: #1E293B;" />
+                <div class="d-flex align-center gap-2 ml-2">
+                    <img src="images/logos/piramide-erprise.png" alt="Erprise {{PRODUCT_SHORT_NAME}}" style="height: 32px; width: 32px; object-fit: contain;" />
+                    <div class="d-flex align-baseline gap-1">
+                        <MudText Typo="Typo.h6" Style="font-family: 'Inter', sans-serif; font-weight: 700; color: #1E293B; letter-spacing: -0.02em;">Erprise</MudText>
+                        <MudText Typo="Typo.h6" Style="font-family: 'Inter', sans-serif; font-weight: 600; color: #0067B1; font-size: 1rem;">{{PRODUCT_SHORT_NAME}}</MudText>
+                    </div>
+                </div>
+                <MudSpacer />
+                <div class="d-flex align-center gap-3">
+                    @* Soporte adaptable: Si el sistema es Multi-Tenant y provee EmpresaLogo, se renderiza dentro de su contenedor blanco *@
+                    @if (GetLogoDataUri(context.User) is { } logoUri)
+                    {
+                        <div style="border: 1px solid #E2E8F0; padding: 2px 6px; border-radius: 6px; background: #FFFFFF; display: flex; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+                            <img src="@logoUri" alt="Logo Empresa" style="max-height: 28px; max-width: 100px; object-fit: contain;" />
+                        </div>
+                    }
+                    <div class="d-flex flex-column align-end">
+                        @if (context.User.FindFirst("EmpresaNombre")?.Value is { Length: > 0 } empresaNombre)
+                        {
+                            <MudText Style="font-weight: 600; font-family: 'Inter', sans-serif; font-size: 0.88rem; color: #1E293B;">@empresaNombre</MudText>
+                            <MudText Style="font-weight: 500; font-family: 'Inter', sans-serif; font-size: 0.75rem; color: #64748B;">@context.User.Identity?.Name</MudText>
+                        }
+                        else
+                        {
+                            <MudText Style="font-weight: 600; font-family: 'Inter', sans-serif; font-size: 0.88rem; color: #1E293B;">@context.User.Identity?.Name</MudText>
+                            <MudText Style="font-weight: 500; font-family: 'Inter', sans-serif; font-size: 0.75rem; color: #64748B;">@(context.User.FindFirst(ClaimTypes.Role)?.Value ?? "Sesión Activa")</MudText>
+                        }
+                    </div>
+                    <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Default" Style="color: #64748B;" OnClick="HandleLogout" title="Cerrar Sesión" />
+                </div>
+            </MudAppBar>
+
+            <MudDrawer @bind-Open="_drawerOpen" Elevation="0" ClipMode="DrawerClipMode.Always" Color="Color.Surface" Style="border-right: 1px solid #E2E8F0;" Class="pt-2">
+                <NavMenu />
+            </MudDrawer>
+
+            <MudMainContent Style="background-color: #F8FAFC; min-height: 100vh; padding-top: calc(var(--mud-appbar-height) + 20px) !important; padding-left: 24px; padding-right: 24px; padding-bottom: 24px;">
+                @Body
+            </MudMainContent>
+        </MudLayout>
+    </Authorized>
+    <NotAuthorized>
+        <MudLayout>
+            <MudMainContent Style="min-height: 100vh; background-color: #F8FAFC;">
+                @Body
+            </MudMainContent>
+        </MudLayout>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private bool _drawerOpen = true;
+
+    private static string? GetLogoDataUri(ClaimsPrincipal user)
+    {
+        var b64 = user.FindFirst("EmpresaLogo")?.Value;
+        if (string.IsNullOrEmpty(b64)) return null;
+
+        byte[] bytes;
+        try
+        {
+            bytes = Convert.FromBase64String(b64);
+        }
+        catch
+        {
+            return null;
+        }
+
+        string mime = "image/png";
+        if (bytes.Length > 3 && bytes[0] == 0xFF && bytes[1] == 0xD8) mime = "image/jpeg";
+        else if (bytes.Length > 3 && bytes[0] == 'G' && bytes[1] == 'I' && bytes[2] == 'F') mime = "image/gif";
+        return $"data:{mime};base64,{b64}";
+    }
+
+    private Task HandleLogout()
+    {
+        // Conectar con el AuthenticationStateProvider o servicio de cierre de sesión del proyecto
+        NavigationManager.NavigateTo("login");
+        return Task.CompletedTask;
+    }
+
+    private void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}

@@ -1,0 +1,66 @@
+html, body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #F8FAFC;
+    color: #1E293B;
+}
+
+a, .btn-link {
+    color: #0067B1;
+    text-decoration: none;
+}
+
+a:hover, .btn-link:hover {
+    color: #004D85;
+    text-decoration: underline;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #0067B1;
+    border-color: #005A9C;
+}
+
+.btn-primary:hover {
+    background-color: #00508A;
+    border-color: #004577;
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem rgba(0, 103, 177, 0.25);
+}
+
+.content {
+    padding-top: 1.1rem;
+}
+
+h1:focus {
+    outline: none;
+}
+
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid #26b050;
+}
+
+.invalid {
+    outline: 1px solid #e50000;
+}
+
+.validation-message {
+    color: #e50000;
+}
+
+/* ERPRISE Theme Utility Classes */
+.erprise-appbar-border {
+    border-bottom: 1px solid #E2E8F0 !important;
+}
+
+.erprise-card-clean {
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 12px !important;
+    background-color: #FFFFFF !important;
+}
+
+.erprise-login-backdrop {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #F8FAFC 0%, #EEF2F6 50%, #E2E8F0 100%);
+}

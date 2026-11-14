@@ -1,0 +1,104 @@
+@page "/login"
+@using Microsoft.AspNetCore.Components.Web
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<div class="d-flex align-center justify-center erprise-login-backdrop" style="min-height: 100vh; padding: 24px;">
+    <MudCard Style="width: 420px; padding: 32px 28px; border-radius: 16px; border: 1px solid #E2E8F0; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03); background-color: #FFFFFF;" Elevation="0">
+        <MudCardHeader Class="justify-center pb-2">
+            <CardHeaderContent>
+                <div class="d-flex flex-column align-center">
+                    <img src="images/logos/logo-erprise.png" alt="Erprise {{PRODUCT_SHORT_NAME}} — {{PRODUCT_SLOGAN}}" style="max-width: 280px; width: 100%; height: auto; object-fit: contain;" class="mb-2" />
+                </div>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent Class="pt-4">
+            <MudForm @ref="_form" @bind-IsValid="_isValid">
+                <MudTextField T="string" Label="Nombre de Usuario" Required="true" RequiredError="El usuario es obligatorio."
+                              @bind-Value="_username" IconSize="Size.Medium" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person"
+                              Immediate="true" Class="mb-4" />
+
+                <MudTextField T="string" Label="Contraseña" InputType="@_passwordInput" Required="true" RequiredError="La contraseña es obligatoria."
+                              @bind-Value="_password" Adornment="Adornment.End" AdornmentIcon="@_passwordInputIcon" OnAdornmentClick="TogglePasswordVisibility"
+                              Immediate="true" IconSize="Size.Medium" Class="mb-6" OnKeyDown="HandleKeyDown" />
+            </MudForm>
+        </MudCardContent>
+        <MudCardActions Class="d-flex flex-column align-stretch pt-0">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" OnClick="HandleLogin" Disabled="_loading"
+                       Style="border-radius: 8px; font-weight: 600; text-transform: none; font-size: 1rem; padding: 10px 0; background-color: #0067B1;">
+                @if (_loading)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Cargando...</MudText>
+                }
+                else
+                {
+                    <MudText>Iniciar Sesión</MudText>
+                }
+            </MudButton>
+            <div class="d-flex justify-center mt-3">
+                <MudLink Href="/" Typo="Typo.body2" Color="Color.Secondary" Style="text-decoration: none; font-weight: 500; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 4px;">
+                    <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Size="Size.Small" /> Volver al sitio web
+                </MudLink>
+            </div>
+            <MudText Typo="Typo.caption" Align="Align.Center" Style="color: #94A3B8; margin-top: 20px;">
+                © @DateTime.Now.Year ERPRISE • Todos los derechos reservados
+            </MudText>
+        </MudCardActions>
+    </MudCard>
+</div>
+
+@code {
+    private MudForm? _form;
+    private bool _isValid;
+    private string _username = "";
+    private string _password = "";
+    private bool _loading = false;
+    private InputType _passwordInput = InputType.Password;
+    private string _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await HandleLogin();
+        }
+    }
+
+    private void TogglePasswordVisibility()
+    {
+        if (_passwordInput == InputType.Password)
+        {
+            _passwordInput = InputType.Text;
+            _passwordInputIcon = Icons.Material.Filled.Visibility;
+        }
+        else
+        {
+            _passwordInput = InputType.Password;
+            _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        if (_form == null) return;
+        await _form.ValidateAsync();
+        if (!_isValid) return;
+
+        _loading = true;
+        try
+        {
+            // Conectar aquí con el servicio de autenticación propio del proyecto
+            await Task.Delay(200);
+            NavigationManager.NavigateTo("/tablero");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error al iniciar sesión: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+}

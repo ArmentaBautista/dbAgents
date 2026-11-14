@@ -1,0 +1,13 @@
+{
+  "name": "erprise-design-system",
+  "displayName": "ERPRISE Design System (SaaS UI & Commercial WebPage)",
+  "version": "1.0.0",
+  "description": "Sistema de diseño institucional ERPRISE para aplicaciones SaaS (.NET Blazor + MudBlazor, Svelte MiniApps y CSS agnóstico), Sitios Web Comerciales estáticos (HTML5/CSS3/JS), integración en raíz sin SignalR, modo Kiosco, reportes Excel ejecutivos y activos de marca.",
+  "logo": "assets/logo.png",
+  "author": "ERPRISE",
+  "suggestedPrompts": [
+    "Aplica el sistema de diseño ERPRISE (ErpriseTheme, MainLayout y Login) a este proyecto Blazor",
+    "Crea el sitio web comercial (WebPage) para este producto con el estilo oficial ERPRISE e intégralo en la ruta raíz '/'",
+    "Diseña una nueva pantalla de catálogo o tablero con KPIs siguiendo los patrones visuales de ERPRISE"
+  ]
+}
